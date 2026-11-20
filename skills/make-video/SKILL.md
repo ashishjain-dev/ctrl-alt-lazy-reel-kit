@@ -27,6 +27,7 @@ Use your multiple-choice question tool if you have one; otherwise ask in one sho
    - *Narrated explainer*: a voice-over over visuals (stats, myth vs fact, lists, photos) → `text-reel` with `narrator` lines
    - *Character skit*: two or more characters talking, comedy or story → `dialogue-skit`
    - *Top-N / countdown*, *myth vs fact*, *before / after*, *quote / story* → `text-reel` with `list`, `split`, `quote`
+   - *Style Drop*: one short animated scene in several art styles, "which one wins?" → `style-drop`
 4. **Length**: 15–30 s (default 25 s) for reach, up to 60 s for a real tutorial.
 5. **Script**: do they have one? If yes, ask them to paste it and keep their words (fix only timing and clarity, and say what you changed). If not, Claude writes it (step 2).
 
@@ -41,8 +42,9 @@ Use your multiple-choice question tool if you have one; otherwise ask in one sho
    - built-ins: `person` (customizable), `bot` (robot), `blob` (cute mascot), `dev` (person with headphones and a `</>` shirt), or
    - a custom person: hair (short, long, curly, bun, spiky, bald), hair colour, skin tone, shirt/pants colours, hat (none, cap, beanie), glasses, headphones, beard, a short shirt icon ("FIT", "$"). Save them under a name in `brand.yaml > characters` so every video in the series reuses them.
    - Moods available: neutral, happy, sad, shocked, angry, deadpan, smug, think, wink (+ error, love for bot/blob).
-8. **Brand**: their handle, a small top label (e.g. "MONEY TIPS"), and 1–2 brand colours, or keep the defaults. Write `brand.yaml` from `brand.example.yaml`.
-9. **Engine**:
+8. **Art style** (optional, Pillow engine): keep the clean default, or re-skin the whole video with `style:` fish-scale-folk (folk painting), rice-paper (ink wash), mud-wall (white on mud wall art), cyan-plan (blueprint) or cut-card (paper cut-out). See `docs/img/style-drop-kite.jpg`.
+9. **Brand**: their handle, a small top label (e.g. "MONEY TIPS"), and 1–2 brand colours, or keep the defaults. Write `brand.yaml` from `brand.example.yaml`.
+10. **Engine**:
    > **(a) Pillow + ffmpeg** (default): Python only, flat 2D characters, renders anywhere.
    > **(b) Remotion + Three.js** (optional): smoother motion, 3D characters. Needs Node 18+, `npm install` and a headless Chrome. Remotion is free for individuals and small teams; larger companies need a paid licence (remotion.dev/license).
 

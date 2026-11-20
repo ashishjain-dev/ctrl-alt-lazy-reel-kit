@@ -20,6 +20,7 @@ reelkit --help
 | `voices.py` | split a recording into clips + lip-sync envelope; TTS (ElevenLabs, OpenAI, macOS `say`, espeak); script export |
 | `covers.py` | cover PNG + 3:4 profile-grid preview |
 | `brand.py` | brand.yaml loading, font lookup |
+| `art/` | hero scenes (`kite.py`: geometry as a pure function of time) and art styles (`painter.py` base + `folk.py`, `ricepaper.py`, `mudwall.py`, `cyanplan.py`, `cutcard.py`); `drop.py` builds Style Drop reels |
 
 Requirements: Python 3.9+, ffmpeg 6+ with libx264, and fonts (Inter + DejaVu by default; any TTF/OTF works via `brand.yaml > fonts`). Speed: about 1 minute per 15 s of 60 fps video on 2 cores; `--preview` is faster, `--workers N` uses more cores.
 

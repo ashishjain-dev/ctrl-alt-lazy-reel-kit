@@ -67,7 +67,7 @@ class Scene:
             el["_mood_at"] = self._mood_fn(who, el.get("mood", "neutral"))
             self.elements.insert(0, el)
         self.shakes = list(d.get("shake", []))
-        self.punch = [0.0] + list(d.get("punch", []))
+        self.punch = ([] if d.get("no_punch") else [0.0]) + list(d.get("punch", []))
         for e in self.elements:
             if e.get("type") == "stamp":
                 self.shakes.append(e.get("at", 0) + 0.18)
@@ -108,6 +108,10 @@ class Timeline:
         vo_path = os.path.join(self.base, (self.raw.get("audio", {}) or {}).get("voices", "vo.json"))
         self.vo = json.load(open(vo_path)) if os.path.exists(vo_path) else {"env": {}, "dur": {}}
         self.vo_dir = os.path.dirname(vo_path)
+        if self.raw.get("style_drop"):          # one scene in N art styles -> generated card scenes
+            from .art.drop import build_scenes
+            self.raw["scenes"] = build_scenes(self.raw["style_drop"]) + list(self.raw.get("scenes") or [])
+            self.raw.setdefault("meta", {}).setdefault("clean", True)
         self.scenes = []
         t = 0.0
         for sd in self.raw.get("scenes", []):

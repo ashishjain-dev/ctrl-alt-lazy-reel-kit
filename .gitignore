@@ -19,3 +19,4 @@ engines/remotion/public/*
 !engines/remotion/public/.gitkeep
 engines/remotion/out/
 stills/
+build/
