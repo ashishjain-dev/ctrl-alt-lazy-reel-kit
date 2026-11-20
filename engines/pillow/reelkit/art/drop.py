@@ -2,7 +2,7 @@
 
 scenes.yaml:
     style_drop:
-      scene: kite
+      scene: kite              # a built-in scene, or instead: file: my_scene.py + impact: 2.0 (custom scene file)
       styles: [fish-scale-folk, rice-paper, mud-wall, cyan-plan, cut-card]
       title: ["5 Kite", "art styles"]
       card_dur: 2.0          # seconds per style card
@@ -36,7 +36,8 @@ def build_scenes(cfg):
     styles = cfg.get("styles") or [s for s in STYLES if s != "flat"]
     cd = float(cfg.get("card_dur", 2.0))
     off = float(cfg.get("clip_offset", 1.05))
-    cut_in = SCENES[cfg.get("scene", "kite")].CUT_T - off
+    impact = float(cfg["impact"]) if cfg.get("file") else SCENES[cfg.get("scene", "kite")].CUT_T
+    cut_in = impact - off
     scenes = []
     for i, st in enumerate(styles):
         scenes.append({"name": f"card{i + 1}", "dur": cd, "no_punch": True, "whoosh": i > 0,
@@ -55,11 +56,25 @@ def _bg(c, im, cfg):
 
 
 def _render_style(scene, style, t, w, h):
-    """Render the scene in a style at full size, return it scaled to w x h (supersampled px)."""
+    """Render the scene in a style at full size, return it scaled to w x h (supersampled px).
+    `scene` is a built-in scene name, or a dict {file, _base, args} for a custom scene file."""
     big = Image.new("RGB", (1080 * K, 1920 * K))
     from ..brand import Brand
-    draw_scene(Cv(big, Brand()), big, scene, style, t)
+    b = Brand()
+    if isinstance(scene, dict):
+        from ..custom import draw_element
+        from . import style_class
+        b.c.update(style_class(style).brand)
+        draw_element(Cv(big, b), big, {**scene, "style": style}, t)
+    else:
+        draw_scene(Cv(big, b), big, scene, style, t)
     return big.resize((int(w * K), int(h * K)), Image.LANCZOS)
+
+
+def _scene_ref(cfg):
+    if cfg.get("file"):
+        return {"file": cfg["file"], "_base": cfg.get("_base", "."), "args": cfg.get("args", {})}
+    return cfg.get("scene", "kite")
 
 
 def _rounded(img, r):
@@ -95,7 +110,7 @@ def drop_frame(c, im, el, t):
     # card with wipe from the previous style
     x0, y0, x1, y1 = CARD
     w, h = x1 - x0, y1 - y0
-    scene = cfg.get("scene", "kite")
+    scene = _scene_ref(cfg)
     off = float(cfg.get("clip_offset", 1.05))
     cur = _render_style(scene, styles[i], off + t, w, h)
     wipe = float(cfg.get("wipe", 0.28))
@@ -121,7 +136,7 @@ def drop_outro(c, im, el, t):
     ink = hex2rgb(cfg.get("ink", "#1d1a17"))
     accent = hex2rgb(cfg.get("accent", "#d6452c"))
     _bg(c, im, cfg)
-    scene = cfg.get("scene", "kite")
+    scene = _scene_ref(cfg)
     tw, th = 300, 533
     cols = 3
     n = len(styles)
@@ -132,7 +147,7 @@ def drop_outro(c, im, el, t):
         y = 160 + row * (th + 30) - 90 * t - (col % 2) * 140
         if y > 1920 or y + th < 0:
             continue
-        clip_t = (2.0 + t * 0.9 + k * 0.37) % 5.0
+        clip_t = (2.0 + t * 0.9 + k * 0.37) % float(cfg.get("clip_dur", 5.0))
         tile = _render_style(scene, st, clip_t, tw, th)
         im.paste(tile, (int(x * K), int(y * K)), _rounded(tile, 20))
     # darken a band and put the CTA on it

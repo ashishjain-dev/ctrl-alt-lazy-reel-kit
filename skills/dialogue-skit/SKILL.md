@@ -28,7 +28,8 @@ No answer → (a).
 
 Show the user, and wait for a go-ahead:
 - **Premise** in one line, and who the audience is (the joke must land for them without context).
-- **Cast**: which characters, and their look if custom (save it in `brand.yaml > characters` for a series).
+- **Cast**: which characters, and their look if custom (save it in `brand.yaml > characters` for a series). If the built-ins can't do the look (a grandmother in a sari, a chef, a character painted in an art style), Claude writes the character as a file (`characters: {dadi: {file: dadi.py}}`) following `docs/custom-art.md` and the style's section in `docs/style-guides.md`; it lip-syncs and changes mood like the built-ins.
+- **Setting** (optional): a background or props drawn for the skit (an office, a kitchen) as a `custom` element.
 - **Hook**: the first spoken line or headline lands in the first second. No setup monologue.
 - **Dialogue**: 4–8 lines, 20–35 s. Every line either escalates or twists; the last line is the punchline or loops back to the first line (loops get rewatched). Keep each line under ~12 words so subtitles stay on 1–2 lines.
 - **Moods per line** (`neutral happy sad shocked angry deadpan smug think`, bot also `error love`) and `react:` beats where the listener's face is the joke.

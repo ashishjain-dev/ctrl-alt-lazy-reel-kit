@@ -19,7 +19,11 @@ _S = {}  # per-process state: timeline, brand, background
 def init(scenes_path, brand_path=None):
     tl = Timeline(scenes_path)
     brand = Brand.load(brand_path or tl.brand_path)
-    brand.raw["characters"] = {**brand.raw.get("characters", {}), **(tl.raw.get("characters") or {})}
+    from .custom import resolve_files
+    bp = brand_path or tl.brand_path
+    bdir = os.path.dirname(os.path.abspath(bp)) if bp else tl.base
+    brand.raw["characters"] = {**resolve_files(brand.raw.get("characters"), bdir),
+                               **resolve_files(tl.raw.get("characters"), tl.base)}
     style = tl.raw.get("style") or (tl.raw.get("meta") or {}).get("style")
     painter = None
     if style:                           # art-style preset for the whole reel: colours, background, overlay

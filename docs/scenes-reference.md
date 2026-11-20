@@ -76,6 +76,7 @@ Every element has `type`, `at` (start, default 0), optional `until` (hide after)
 | `list` | items[], x 90, y 620, step 1.0, size 50, gap, countdown false, color accent | numbered top-N list (`countdown: true` shows N..1) |
 | `emoji` | char "🔥", x 540, y 900, size 200, angle 0, bounce false | big emoji; needs a colour emoji font on the machine |
 | `scene` | name kite, style (default: the reel's `style`, else flat), at, offset | a full-frame animated hero scene painted in an art style (Pillow engine) |
+| `custom` | file (a .py next to scenes.yaml), at, until, args {…}, style | art written for this video: `draw(ctx, t, args)`. See [custom-art.md](custom-art.md) |
 
 Emoji also work inline in any text (`"Payday 💸"`). Pillow needs a colour emoji font (Noto Color Emoji on Linux, built in on macOS/Windows); `reelkit check` tells you. Remotion uses the system emoji font the same way.
 
@@ -91,7 +92,7 @@ Built-in, original characters (drawn from code, nothing to license). See them al
 | `dev` | preset: person + headphones + `</>` shirt | same as person |
 
 Moods: `neutral happy sad shocked angry deadpan smug think wink` (+ `error love` for bot and blob).
-Name your own in `brand.yaml > characters` (or a `characters:` block in scenes.yaml) with a `base:` and any options, then use the name as `who`. Pillow draws them flat 2D; Remotion draws the same looks in 3D.
+Name your own in `brand.yaml > characters` (or a `characters:` block in scenes.yaml) with a `base:` and any options, then use the name as `who`. A character can also be its own drawing file: `dadi: {file: dadi.py}` with `draw(c, x, y, s, mood, t, talk, opts)`; it gets lip sync, moods and reactions like the built-ins ([custom-art.md](custom-art.md)). Pillow draws them flat 2D; Remotion draws the same looks in 3D.
 
 ```yaml
 cast:
@@ -119,6 +120,7 @@ A `style_drop:` block replaces `scenes:` with generated cards: a title, a number
 ```yaml
 style_drop:
   scene: kite                       # built-in hero scene (5 s, cut at 2.0 s)
+  # file: my_scene.py               # or your own scene file, painted per style (then also: impact, clip_dur)
   styles: [fish-scale-folk, rice-paper, mud-wall, cyan-plan, cut-card]
   title: ["5 kite styles", "one Makar Sankranti cut"]
   card_dur: 2.0

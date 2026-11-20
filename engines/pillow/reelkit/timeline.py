@@ -110,6 +110,7 @@ class Timeline:
         self.vo_dir = os.path.dirname(vo_path)
         if self.raw.get("style_drop"):          # one scene in N art styles -> generated card scenes
             from .art.drop import build_scenes
+            self.raw["style_drop"]["_base"] = self.base
             self.raw["scenes"] = build_scenes(self.raw["style_drop"]) + list(self.raw.get("scenes") or [])
             self.raw.setdefault("meta", {}).setdefault("clean", True)
         self.scenes = []

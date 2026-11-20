@@ -9,7 +9,8 @@ Every character takes (c: Cv, x, y, scale, mood, t, talk, opts). (x, y) is the b
 `talk` is mouth opening 0..1 (lip sync), `t` is local time (blinks, idle motion), `opts` the look.
 Moods: neutral, happy, sad, shocked, angry, deadpan, smug, think, wink (+ error, love for bot/blob).
 
-Named characters live in brand.yaml so a whole series reuses them:
+A character can also be its own drawing file, `{file: dadi.py}` (see custom.py), e.g. a character
+painted in an art style. Named characters live in brand.yaml so a whole series reuses them:
     characters:
       maya: {base: person, hair: long, hair_color: "#5a3524", skin: "#c68c64", shirt: "#e8805c", glasses: true}
       coach: {base: person, hair: bald, beard: true, shirt_icon: "FIT"}
@@ -279,6 +280,9 @@ def resolve(who, brand_chars=None):
             raise ValueError(f"unknown character '{who}'. Built-in: {sorted(CHARACTERS)} + presets {sorted(PRESETS)}; "
                              "or define it under brand.yaml > characters with a `base:`")
         spec = {**nxt, **spec}
+        if nxt.get("file"):                 # custom character drawn by its own file (see custom.py)
+            from .custom import character_fn
+            return character_fn(nxt["file"]), {k: v for k, v in spec.items() if k not in ("file", "base")}
         name = nxt.get("base", "person")
         seen += 1
     # brand.yaml may also recolour a built-in directly (characters: {bot: {...}})

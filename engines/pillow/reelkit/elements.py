@@ -455,6 +455,14 @@ def scene(c, im, el, t):
                t - el.get("at", 0) + el.get("offset", 0))
 
 
+def custom(c, im, el, t):
+    """Art written for this video: {type: custom, file: my_scene.py, args: {...}} (see custom.py)."""
+    if t < el.get("at", 0):
+        return
+    from .custom import draw_element
+    draw_element(c, im, el, t - el.get("at", 0))
+
+
 def drop_frame(c, im, el, t):
     from .art import drop
     drop.drop_frame(c, im, el, t)
@@ -469,7 +477,7 @@ TYPES = {
     "headline": headline, "text": text, "terminal": terminal, "bubble": bubble, "sticker": sticker,
     "pill": pill, "checklist": checklist, "stamp": stamp, "image": image, "character": character,
     "progress_ring": progress_ring, "stat": stat, "quote": quote, "split": split, "photo": photo,
-    "list": numbered, "emoji": emoji_el, "scene": scene, "drop_frame": drop_frame, "drop_outro": drop_outro,
+    "list": numbered, "emoji": emoji_el, "scene": scene, "custom": custom, "drop_frame": drop_frame, "drop_outro": drop_outro,
 }
 
 

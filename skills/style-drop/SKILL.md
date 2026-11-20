@@ -28,7 +28,7 @@ pip install -e engines/pillow && reelkit check
 
 ## 1. Ask (one round), then confirm a plan
 
-- **Scene**: the built-in kite, or a new subject? (A new scene is real work: see step 5.) Keep it one clear action with one peak moment at a fixed time, shapes that read in every style, and something viewers recognise instantly.
+- **Scene**: the built-in kite, or the user's own subject (their product, a dragon, a chai cup…). For their own subject, write one custom scene file (step 5) that paints every chosen style. Keep it one clear action with one peak moment at a fixed time, shapes that read in every style, and something viewers recognise instantly.
 - **Styles**: which ones and how many (3–10). Each card is ~2 s, so 5 styles ≈ 13 s with the outro, 10 ≈ 23 s.
 - **Title** (two short lines), **CTA keyword** ("COMMENT 'KITE' FOR THE PROMPTS"), **music mood** (`upbeat` default).
 - Show the plan (scene, styles in order, title, CTA, length) and wait for a go-ahead before rendering.
@@ -71,7 +71,7 @@ Sound: generated music, a whoosh into each card and a hit on each cut. Add a voi
 
 Create `engines/pillow/reelkit/art/<name>.py` with a `Painter` subclass and register it in `art/__init__.py > STYLES` (and a display name in `art/drop.py > NAMES`). Override only what changes: `background, sun, bg_kites, skyline, birds, strings, rival, tail, hero, hero_face, burst, shout, overlay`; set `fps` (e.g. 8 or 12) and `jitter` for a hand-made, stepped look; set `brand` colours so the style also works as a whole-reel preset. Helpers in `painter.py`: `fill_pattern` + `tile` (scales, dots, hatch, cross, waves, grid), `soft_poly` (washes, glows, brush strokes), `shadow_poly`, `dashed`, `paper_texture`, `local` (draw in kite coordinates).
 
-Five more styles, ready to build (describe the look in your own words like this when you ask Claude):
+Full style guides for all ten styles (surface, palette, line, fill, figures, motion, impact, text, frame, avoid): `docs/style-guides.md`. Five more styles, ready to build:
 - **Lamp Leather**: translucent dyed-leather puppets on a cotton screen lit by a flickering oil lamp; punched dot holes glowing, carved outlines, control rods running off the bottom, a soft shadow, a lamp flare at the cut.
 - **Temple Glass**: every shape a mosaic of jewel-coloured glass in dark lead lines inside an arched window with iron bars; light glows through; a white-gold glass star at the cut.
 - **Cel Burst**: TV-anime cel shading, saturated sky and towering clouds, two-tone hard shadows, bold lines, speed lines on the swoop, a 3-frame black/white impact flash then a red frame at the cut.
@@ -80,10 +80,22 @@ Five more styles, ready to build (describe the look in your own words like this 
 
 Check each new style with `reelkit stills` at 0.6, 2.0 and 4.0 s before adding it to a drop.
 
-## 5. Add a new hero scene
+## 5. The user's own scene (no engine changes)
 
-Create `engines/pillow/reelkit/art/<scene>.py` with `DUR`, `CUT_T` and `layout(t)` and register it in `art/__init__.py > SCENES`. Rules: `layout(t)` is a pure function of time (no state between frames), the peak moment is at a fixed `CUT_T`, geometry only (where things are), never colours. Reusing the kite's keys (`hero`, `rival`, `skyline`, `burst`...) lets every existing style paint it at once; new keys need new painter methods in each style.
+Write one file and point the drop at it:
+```yaml
+style_drop:
+  file: chai_scene.py       # draw(ctx, t, args); ctx.style says which style to paint
+  impact: 2.0               # the big moment, same time in every style
+  clip_dur: 5.0
+  styles: [fish-scale-folk, mud-wall, cyan-plan]
+```
+Branch on `ctx.style` and paint each style from its section in `docs/style-guides.md`; start with `ctx.painter.background({})` and end with `ctx.painter.overlay({})` for each style's surface and frame. Keep it a pure function of `t` with one clear action that peaks at `impact`. Rules and helpers: `docs/custom-art.md`. Check every style with `reelkit stills` (clip.yaml with `{type: custom, file: chai_scene.py, style: mud-wall}`) before building the drop.
 
-## 6. Deliver
+## 6. Add a new built-in hero scene
+
+Only for scenes many people will reuse. Create `engines/pillow/reelkit/art/<scene>.py` with `DUR`, `CUT_T` and `layout(t)` and register it in `art/__init__.py > SCENES`. Rules: `layout(t)` is a pure function of time (no state between frames), the peak moment is at a fixed `CUT_T`, geometry only (where things are), never colours. Reusing the kite's keys (`hero`, `rival`, `skyline`, `burst`...) lets every existing style paint it at once; new keys need new painter methods in each style.
+
+## 7. Deliver
 
 The reel MP4, a cover (`reelkit cover`), a caption that asks people to pick their favourite style (comments), the CTA keyword, and the list of styles used. Never write real people's names or brands into a scene.
