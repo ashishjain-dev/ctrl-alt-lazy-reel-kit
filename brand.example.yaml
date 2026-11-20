@@ -1,6 +1,6 @@
 # Copy to brand.yaml and edit. Every key is optional; missing keys use neutral defaults.
 handle: "@your.handle"          # watermark + cover footer. "" hides it
-label: "DEV TIPS"               # small label in the top band. "" hides it
+label: "QUICK TIPS"               # small label in the top band. "" hides it
 
 colors:                         # hex. Text marked *like this* uses `highlight`
   bg_top: "#1a1622"
@@ -22,7 +22,7 @@ fonts:                          # file names (searched in system font folders) o
   mono: ["JetBrainsMono-Bold.ttf", "DejaVuSansMono-Bold.ttf"]
 
 web_fonts:                      # Remotion engine only (CSS font-family)
-  display: "Inter, 'DejaVu Sans', sans-serif"
+  display: "Inter, 'DejaVu Sans', 'Noto Color Emoji', sans-serif"
   mono: "'JetBrains Mono', 'DejaVu Sans Mono', monospace"
 
 frame:
@@ -38,6 +38,19 @@ music:
   bpm: 92
   volume: 0.55
 
-characters:                     # recolour the built-in characters
-  dev: {skin: "#f1c7a3", hair: "#3a2a24", shirt: "#3fa796", phones: "#e8805c", pants: "#2c3450"}
-  bot: {body: "#c9d2e0", screen: "#141a26", eyes: "#7af0c8", trim: "#5a6a86"}
+characters:                     # your cast: recolour built-ins or define named characters (base: person | bot | blob)
+  # bot: {body: "#c9d2e0", screen: "#141a26", eyes: "#7af0c8", trim: "#5a6a86"}
+  # blob: {body: "#8fd0ff", belly: "#d9f0ff", sprout: true}
+  host:
+    base: person
+    hair: curly                 # short | long | curly | bun | spiky | bald
+    hair_color: "#1e1a1a"
+    skin: "#8d5a3b"
+    shirt: "#7a6cf0"
+    pants: "#2c3450"
+    accent: "#e8805c"           # hat / headphones colour
+    hat: none                   # none | cap | beanie
+    glasses: false
+    headphones: false
+    beard: false
+    shirt_icon: ""              # short text on the shirt, e.g. "FIT", "$", "</>"

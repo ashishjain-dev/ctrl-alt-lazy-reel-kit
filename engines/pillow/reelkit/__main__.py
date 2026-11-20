@@ -8,7 +8,9 @@
   python -m reelkit grid    new.png older1.png older2.png -o grid.png
   python -m reelkit voices split dialogue.mp3 a1=0-1.6 b1=1.9-3.2 [--dir ep/] [--tighten 0.12] [--tempo 1.05] [--robot b]
   python -m reelkit voices gaps  dialogue.mp3
-  python -m reelkit voices tts   scenes.yaml                         # ElevenLabs, needs ELEVENLABS_API_KEY
+  python -m reelkit voices script scenes.yaml                        # spoken lines to record or paste into TTS
+  python -m reelkit voices tts   scenes.yaml [--provider elevenlabs|openai|say|espeak] [--force]
+  python -m reelkit characters -o gallery.png [--brand brand.yaml]   # every character, look and mood
   python -m reelkit check                                            # python deps, ffmpeg, fonts
 """
 import argparse
@@ -43,6 +45,14 @@ def cmd_check(_):
     except FileNotFoundError as e:
         ok = False
         print("MISSING fonts:", e)
+    from . import emoji
+    f = emoji.emoji_font()
+    print(f"ok   emoji font: {f.path}" if f else
+          "note no colour emoji font: emoji are skipped (apt install fonts-noto-color-emoji; macOS/Windows have one)")
+    tts = [n for n, ok_ in (("elevenlabs", os.environ.get("ELEVENLABS_API_KEY")), ("openai", os.environ.get("OPENAI_API_KEY")),
+                            ("say", shutil.which("say")), ("espeak", shutil.which("espeak-ng") or shutil.which("espeak"))) if ok_]
+    print("ok   text-to-speech: " + ", ".join(tts) if tts else
+          "note no text-to-speech available: record voices yourself, or set ELEVENLABS_API_KEY / OPENAI_API_KEY")
     sys.exit(0 if ok else 1)
 
 
@@ -107,6 +117,11 @@ def cmd_grid(a):
     print(covers.grid(a.images, a.out))
 
 
+def cmd_characters(a):
+    from . import gallery
+    print(gallery.gallery(a.out, a.brand))
+
+
 def cmd_voices(a):
     from . import voices
     if a.action == "split":
@@ -116,7 +131,10 @@ def cmd_voices(a):
         print("\n".join(voices.silences(a.src)))
     elif a.action == "tts":
         from .timeline import Timeline
-        voices.tts_elevenlabs(Timeline(a.src))
+        voices.tts(Timeline(a.src), a.provider, a.force)
+    elif a.action == "script":
+        from .timeline import Timeline
+        print(voices.script(Timeline(a.src)))
 
 
 def main(argv=None):
@@ -135,10 +153,13 @@ def main(argv=None):
     s.add_argument("--brand"); s.set_defaults(fn=cmd_cover)
     s = sub.add_parser("grid"); s.add_argument("images", nargs="+"); s.add_argument("-o", "--out", default="grid.png")
     s.set_defaults(fn=cmd_grid)
-    s = sub.add_parser("voices"); s.add_argument("action", choices=["split", "gaps", "tts"]); s.add_argument("src")
+    s = sub.add_parser("voices"); s.add_argument("action", choices=["split", "gaps", "tts", "script"]); s.add_argument("src")
     s.add_argument("specs", nargs="*"); s.add_argument("--dir", default="."); s.add_argument("--tighten", type=float)
     s.add_argument("--tempo", type=float, default=1.0); s.add_argument("--robot", help="key prefix that gets the robot filter")
+    s.add_argument("--provider", choices=["elevenlabs", "openai", "say", "espeak"]); s.add_argument("--force", action="store_true")
     s.set_defaults(fn=cmd_voices)
+    s = sub.add_parser("characters"); s.add_argument("-o", "--out", default="characters.png"); s.add_argument("--brand")
+    s.set_defaults(fn=cmd_characters)
     s = sub.add_parser("check"); s.set_defaults(fn=cmd_check)
     a = p.parse_args(argv)
     a.fn(a)

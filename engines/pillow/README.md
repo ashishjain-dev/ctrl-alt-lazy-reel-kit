@@ -12,10 +12,12 @@ reelkit --help
 |---|---|
 | `timeline.py` | scenes.yaml → absolute timeline (scenes, dialogue timing from voice clips, camera beats, SFX events) |
 | `render.py` | frame renderer (camera punch-ins/shakes, frame overlay), stills + contact sheet, multiprocess encode |
-| `elements.py` | headline, text, terminal, bubble, sticker, pill, checklist, stamp, image, character, progress_ring, subtitles |
-| `characters.py` | the two built-in characters (`dev`, `bot`); register your own in `CHARACTERS` |
+| `elements.py` | headline, text, terminal, bubble, sticker, pill, checklist, stamp, image, character, progress_ring, stat, quote, split, photo, list, emoji, subtitles |
+| `characters.py` | built-in characters (`person` with look options, `bot`, `blob`, `dev` preset), named characters from brand.yaml; register new ones in `CHARACTERS` |
+| `gallery.py` | `reelkit characters`: one sheet with every character, look and mood |
+| `emoji.py` | colour emoji (inline and the `emoji` element) via the system emoji font |
 | `audio.py` | generated music (chill / upbeat / tense), SFX, voice placement, ducking |
-| `voices.py` | split a dialogue file into clips + lip-sync envelope; optional ElevenLabs TTS |
+| `voices.py` | split a recording into clips + lip-sync envelope; TTS (ElevenLabs, OpenAI, macOS `say`, espeak); script export |
 | `covers.py` | cover PNG + 3:4 profile-grid preview |
 | `brand.py` | brand.yaml loading, font lookup |
 

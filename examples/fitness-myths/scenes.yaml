@@ -1,0 +1,63 @@
+# General-audience example: myth vs fact with a narrator voice-over and a named character.
+# No voice files yet -> timing is estimated from the words. Add a voice-over later with
+#   reelkit voices tts examples/fitness-myths/scenes.yaml --provider say|espeak|elevenlabs|openai
+meta: {title: "fitness-myths", fps: 60}
+brand: ../../brand.example.yaml
+audio:
+  music: {mood: upbeat, volume: 0.45}
+
+characters:                      # series characters for this video (or put them in brand.yaml)
+  coach: {base: person, hair: bald, beard: true, hair_color: "#4a3426", skin: "#b47a55", shirt: "#3fa796", shirt_icon: "FIT"}
+
+cover:
+  tag: "MYTHS"
+  headline: "Sweating more burns *more fat?*"
+  sub: "2 gym myths, busted"
+  character: {who: coach, mood: smug, x: 760, y: 1640, scale: 0.85}
+
+scenes:
+  - name: hook
+    glow: accent
+    elements:
+      - {type: headline, text: "You *can't* burn belly fat with crunches", y: 440}
+      - {type: character, who: coach, mood: smug, x: 540, y: 1150, scale: 0.75}
+    dialogue:
+      - {who: narrator, voice: n1, text: "Crunches won't burn belly fat. Here's why."}
+
+  - name: myth1
+    elements:
+      - {type: headline, text: "Myth #1", y: 420}
+      - type: split
+        at: 0.3
+        step: 1.6
+        left: {title: "MYTH", text: "Crunches melt *belly* fat"}
+        right: {title: "FACT", text: "Fat loss happens *all over* the body"}
+    dialogue:
+      - {who: narrator, voice: n2, text: "You can't pick where your body loses fat. Crunches build muscle, but the fat on top goes when you lose it everywhere."}
+
+  - name: myth2
+    elements:
+      - {type: headline, text: "Myth #2", y: 420}
+      - type: split
+        at: 0.3
+        step: 1.6
+        left: {title: "MYTH", text: "More sweat = more *fat* burned"}
+        right: {title: "FACT", text: "Sweat is *cooling*, not burning"}
+    dialogue:
+      - {who: narrator, voice: n3, text: "Sweat just cools you down. A hot room makes you sweat more, not burn more."}
+
+  - name: what-works
+    glow: good
+    elements:
+      - {type: headline, text: "What *actually* works", y: 420}
+      - {type: checklist, at: 0.4, y: 640, step: 0.9, items: ["Strength training", "Enough *protein* + sleep", "A small, steady calorie deficit"]}
+      - {type: character, who: coach, mood: happy, x: 790, y: 1420, scale: 0.6, at: 2.6}
+    dialogue:
+      - {who: narrator, voice: n4, text: "Lift, eat enough protein, sleep, and stay consistent."}
+
+  - name: cta
+    dur: 2.6
+    elements:
+      - {type: emoji, char: "💪", at: 0.1, y: 760, size: 220, bounce: true}
+      - {type: pill, text: "Save this for leg day", at: 0.4, y: 1060}
+      - {type: sticker, text: "send this to your\ngym buddy", at: 0.9, x: 560, y: 1260, angle: -4}

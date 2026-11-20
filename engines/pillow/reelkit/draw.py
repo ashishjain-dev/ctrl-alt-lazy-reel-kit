@@ -1,6 +1,8 @@
 """Drawing primitives on a supersampled canvas. Scene coordinates are always output pixels (1080x1920)."""
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
+from . import emoji
+
 K = 2  # supersampling factor; frames are drawn at K x and downsampled (smooth edges)
 _FC = {}
 
@@ -77,11 +79,36 @@ class Cv:
         return font(self.b.fonts.get(kind, kind), size)
 
     def text(self, xy, s, size, kind="display", fill=None, anchor="mm"):
-        self.d.text((int(xy[0] * K), int(xy[1] * K)), s, font=self.f(kind, size),
-                    fill=fill or self.b.c["fg"], anchor=anchor)
+        fill = fill or self.b.c["fg"]
+        runs = emoji.split(s)
+        if not any(e for e, _ in runs):
+            self.d.text((int(xy[0] * K), int(xy[1] * K)), s, font=self.f(kind, size), fill=fill, anchor=anchor)
+            return
+        # mixed text + emoji: lay runs out left to right, vertically centred on the anchor line
+        w = self.tw(s, size, kind)
+        x = {"l": xy[0], "m": xy[0] - w / 2, "r": xy[0] - w}[anchor[0]]
+        y = xy[1]
+        for is_e, run in runs:
+            if is_e:
+                g = emoji.glyph(run, size * 1.05 * K)
+                if g is not None:
+                    x += size * 0.06
+                    self.im.paste(g, (int(x * K), int(y * K - g.height / 2)), g)
+                    x += g.width / K + size * 0.06
+            else:
+                self.d.text((int(x * K), int(y * K)), run, font=self.f(kind, size), fill=fill, anchor="l" + anchor[1])
+                x += self.d.textlength(run, font=self.f(kind, size)) / K
 
     def tw(self, s, size, kind="display"):
-        return self.d.textlength(s, font=self.f(kind, size)) / K
+        runs = emoji.split(s)
+        total = 0.0
+        for is_e, run in runs:
+            if is_e:
+                g = emoji.glyph(run, size * 1.05 * K)
+                total += (g.width / K + size * 0.12) if g is not None else 0
+            else:
+                total += self.d.textlength(run, font=self.f(kind, size)) / K
+        return total
 
     def fit(self, s, size, kind, maxw, minsize=24):
         while size > minsize and self.tw(s, size, kind) > maxw:

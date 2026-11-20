@@ -1,5 +1,5 @@
 import React from "react";
-import { Img, interpolate, spring, staticFile, useVideoConfig } from "remotion";
+import { Img, continueRender, delayRender, interpolate, spring, staticFile, useVideoConfig } from "remotion";
 import type { Brand, El } from "./types";
 
 export const col = (b: Brand, v: string | undefined, d = "fg") => {
@@ -14,8 +14,26 @@ export const usePop = (t: number, at = 0) => {
   return spring({ frame: Math.round((t - at) * fps), fps, config: { damping: 11, stiffness: 160, mass: 0.6 } });
 };
 
+const EMOJI = /\p{Extended_Pictographic}/u;
+
+/** Hold the frame until the colour emoji glyphs in `text` are ready. Uses the system emoji font
+ *  (macOS/Windows have one; Linux: apt install fonts-noto-color-emoji). */
+export const useEmojiFont = (text: string) => {
+  const has = EMOJI.test(text);
+  const [handle] = React.useState(() => (has ? delayRender("emoji font") : null));
+  React.useEffect(() => {
+    if (handle === null) return;
+    document.fonts.load("100px 'Noto Color Emoji'", text).then(() => continueRender(handle), () => continueRender(handle));
+  }, [handle, text]);
+};
+
 /** "*word*" -> highlighted spans. */
-export const Rich: React.FC<{ text: string; b: Brand }> = ({ text, b }) => (
+export const Rich: React.FC<{ text: string; b: Brand }> = ({ text, b }) => {
+  useEmojiFont(String(text));
+  return <RichInner text={text} b={b} />;
+};
+
+const RichInner: React.FC<{ text: string; b: Brand }> = ({ text, b }) => (
   <>
     {String(text).split("*").map((p, i) =>
       i % 2 ? (
@@ -191,7 +209,134 @@ export const ProgressRing: React.FC<{ el: El; t: number; b: Brand }> = ({ el, t,
   );
 };
 
+export const Stat: React.FC<{ el: El; t: number; b: Brand }> = ({ el, t, b }) => {
+  const u = usePop(t, el.at ?? 0);
+  if (u === null) return null;
+  const val = String(el.value ?? "100%");
+  const m = val.match(/\d[\d,]*\.?\d*/);
+  let shown = val;
+  if (m && el.count_up !== false) {
+    const num = parseFloat(m[0].replace(/,/g, ""));
+    const k = interpolate(t - (el.at ?? 0), [0, el.count_dur ?? 0.9], [0, 1], { extrapolateRight: "clamp" });
+    const e = k * k * (3 - 2 * k);
+    const dec = m[0].includes(".") ? m[0].split(".")[1].length : 0;
+    const cur = (num * e).toFixed(dec);
+    const txt = m[0].includes(",") ? Number(cur).toLocaleString("en-US", { minimumFractionDigits: dec, maximumFractionDigits: dec }) : cur;
+    shown = val.slice(0, m.index) + txt + val.slice((m.index ?? 0) + m[0].length);
+  }
+  const size = el.size ?? 220;
+  return (
+    <div style={abs(0, (el.y ?? 860) - size * 0.6 + (1 - u) * 60, { width: 1080, textAlign: "center" })}>
+      <div style={{ font: `900 ${size}px/1.2 ${b.web_fonts.display}`, color: col(b, el.color, "accent") }}>{shown}</div>
+      {el.label ? <div style={{ font: `700 ${el.label_size ?? 50}px/1.3 ${b.web_fonts.display}`, color: b.colors.fg, padding: "0 90px" }}><Rich text={el.label} b={b} /></div> : null}
+    </div>
+  );
+};
+
+export const Quote: React.FC<{ el: El; t: number; b: Brand }> = ({ el, t, b }) => {
+  const u = usePop(t, el.at ?? 0);
+  if (u === null) return null;
+  const accent = col(b, el.color, "accent");
+  const size = el.size ?? 56;
+  return (
+    <div style={abs(el.x ?? 90, (el.y ?? 640) + (1 - u) * 50, { width: el.w ?? 900, boxSizing: "border-box", background: b.colors.panel,
+      borderLeft: `14px solid ${accent}`, borderRadius: 30, padding: "30px 56px 40px", boxShadow: "0 18px 40px rgba(0,0,0,.5)" })}>
+      <div style={{ font: `900 ${size * 2.4}px/0.8 ${b.web_fonts.display}`, color: accent, height: size * 1.1 }}>{"\u201c"}</div>
+      <div style={{ font: `700 ${size}px/1.3 ${b.web_fonts.display}`, color: b.colors.fg }}><Rich text={el.text} b={b} /></div>
+      {el.author ? <div style={{ font: `700 ${size * 0.62}px ${b.web_fonts.display}`, color: b.colors.muted, marginTop: 20 }}>{"\u2014 " + el.author}</div> : null}
+    </div>
+  );
+};
+
+export const Split: React.FC<{ el: El; t: number; b: Brand }> = ({ el, t, b }) => {
+  const t0 = el.at ?? 0, step = el.step ?? 1.2;
+  const sides = [
+    { x: 70, side: el.left ?? {}, d: "bad", mark: "\u00d7", title: "BEFORE", u: usePop(t, t0) },
+    { x: 555, side: el.right ?? {}, d: "good", mark: "\u2713", title: "AFTER", u: usePop(t, t0 + step) },
+  ];
+  const y = el.y ?? 640, h = el.h ?? 480, size = el.size ?? 46;
+  const vs = usePop(t, t0 + step);
+  return (
+    <>
+      {sides.map(({ x, side, d, mark, title, u }, i) => {
+        if (u === null) return null;
+        const cc = col(b, side.color, d);
+        return (
+          <div key={i} style={abs(x, y + (1 - u) * 60, { width: 455, height: h, boxSizing: "border-box", background: b.colors.panel,
+            border: `5px solid ${cc}`, borderRadius: 30, overflow: "hidden" })}>
+            <div style={{ background: cc, color: b.colors.ink, textAlign: "center", font: `900 46px/96px ${b.web_fonts.display}` }}>{side.title ?? title}</div>
+            <div style={{ padding: "26px 28px", font: `700 ${size}px/1.3 ${b.web_fonts.display}`, color: b.colors.fg }}>
+              {side.text ? <div><Rich text={side.text} b={b} /></div> : null}
+              {(side.items ?? []).map((it: string, j: number) => (
+                <div key={j} style={{ display: "flex", gap: 14, fontSize: size * 0.9, marginTop: 10 }}><span style={{ color: cc }}>{mark}</span><span><Rich text={it} b={b} /></span></div>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+      {el.vs !== false && vs !== null ? (
+        <div style={abs(488, y + h / 2 - 52, { width: 104, height: 104, borderRadius: 52, background: b.colors.highlight, color: b.colors.ink,
+          display: "flex", alignItems: "center", justifyContent: "center", font: `900 40px ${b.web_fonts.display}` })}>{el.vs_text ?? "VS"}</div>
+      ) : null}
+    </>
+  );
+};
+
+export const Photo: React.FC<{ el: El; t: number; b: Brand }> = ({ el, t, b }) => {
+  const u = usePop(t, el.at ?? 0);
+  if (u === null) return null;
+  const w = el.w ?? 940, h = el.h ?? 700;
+  const [z0, z1] = el.zoom ?? [1.0, 1.15];
+  const z = interpolate(t - (el.at ?? 0), [0, el.dur ?? 5], [z0, z1], { extrapolateRight: "clamp" });
+  const [px, py] = el.pan ?? [0.5, 0.5];
+  const src = /^https?:/.test(el.src) ? el.src : staticFile(el.src);
+  return (
+    <div style={abs((el.x ?? 540) - w / 2, (el.y ?? 860) - h / 2 + (1 - u) * 50, { width: w, height: h, borderRadius: el.radius ?? 30, overflow: "hidden",
+      boxShadow: "0 18px 40px rgba(0,0,0,.55)" })}>
+      <Img src={src} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: `${px * 100}% ${py * 100}%`,
+        transform: `scale(${z})`, transformOrigin: `${px * 100}% ${py * 100}%` }} />
+      {el.caption ? <div style={{ position: "absolute", left: "50%", bottom: 24, transform: "translateX(-50%)", background: col(b, el.color, "accent"),
+        color: b.colors.ink, padding: "0.3em 0.8em", borderRadius: 999, font: `700 40px ${b.web_fonts.display}`, whiteSpace: "nowrap" }}>{el.caption}</div> : null}
+    </div>
+  );
+};
+
+export const List: React.FC<{ el: El; t: number; b: Brand }> = ({ el, t, b }) => {
+  const items: string[] = el.items ?? [];
+  const size = el.size ?? 50, step = el.step ?? 1.0, gap = el.gap ?? size * 2.4;
+  const pops = items.map((_, i) => usePop(t, (el.at ?? 0) + i * step));
+  return (
+    <>
+      {items.map((it, i) => {
+        const u = pops[i];
+        if (u === null) return null;
+        const num = el.countdown ? items.length - i : i + 1;
+        return (
+          <div key={i} style={abs((el.x ?? 90) - (1 - u) * 80, (el.y ?? 620) + i * gap, { display: "flex", alignItems: "center", gap: size * 0.5,
+            transform: "translateY(-50%)", width: 900, font: `700 ${size}px/1.2 ${b.web_fonts.display}`, color: b.colors.fg })}>
+            <span style={{ background: col(b, el.color, "accent"), color: b.colors.ink, borderRadius: 22, minWidth: size * 1.7, textAlign: "center",
+              font: `900 ${size * 1.1}px/${size * 1.7}px ${b.web_fonts.display}` }}>{num}</span>
+            <span><Rich text={it} b={b} /></span>
+          </div>
+        );
+      })}
+    </>
+  );
+};
+
+export const Emoji: React.FC<{ el: El; t: number; b: Brand }> = ({ el, t, b }) => {
+  useEmojiFont(el.char ?? "\u{1F525}");
+  const u = usePop(t, el.at ?? 0);
+  if (u === null) return null;
+  const bounce = el.bounce ? Math.abs(Math.sin((t - (el.at ?? 0)) * 4)) * 24 : 0;
+  return (
+    <div style={abs(el.x ?? 540, (el.y ?? 900) - bounce, { transform: `translate(-50%,-50%) rotate(${-(el.angle ?? 0)}deg) scale(${u})`,
+      font: `400 ${el.size ?? 200}px/1 'Noto Color Emoji', ${b.web_fonts.display}` })}>{el.char ?? "\u{1F525}"}</div>
+  );
+};
+
 export const TYPES: Record<string, React.FC<{ el: El; t: number; b: Brand }>> = {
   headline: Headline, text: Text, terminal: Terminal, bubble: Bubble, sticker: Sticker, pill: Pill,
   checklist: Checklist, stamp: Stamp, image: Image, progress_ring: ProgressRing,
+  stat: Stat, quote: Quote, split: Split, photo: Photo, list: List, emoji: Emoji,
 };

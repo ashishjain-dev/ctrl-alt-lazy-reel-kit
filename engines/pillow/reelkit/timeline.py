@@ -14,7 +14,7 @@ LINE_PAD = 0.35     # default silence between dialogue lines
 
 class Line:
     def __init__(self, d, start, dur, env):
-        self.who = d.get("who", "dev")
+        self.who = d.get("who", "narrator")
         self.text = d.get("text", "")
         self.mood = d.get("mood")
         self.react = d.get("react", {}) or {}
@@ -61,7 +61,7 @@ class Scene:
         # cast -> character elements wired to the dialogue
         for cd in d.get("cast", []) or []:
             el = dict(cd, type="character")
-            who = el.get("who", "dev")
+            who = el.get("who", "person")
             mine = [ln for ln in self.lines if ln.who == who]
             el["_talk"] = (lambda ls: lambda tt: max([ln.talk(tt) for ln in ls] or [0.0]))(mine)
             el["_mood_at"] = self._mood_fn(who, el.get("mood", "neutral"))
@@ -138,9 +138,12 @@ class Timeline:
                 if e.get("type") == "terminal" and e.get("cps", 26):
                     n = sum(len(x) for x in e.get("lines", []))
                     ev.append((at + 0.25, "typing", {"n": min(n, 400), "cps": e.get("cps", 26)}))
-                elif e.get("type") == "checklist":
+                elif e.get("type") in ("checklist", "list"):
                     for k in range(len(e.get("items", []))):
-                        ev.append((at + k * e.get("step", 0.6), "blip", {"f": 700 + k * 90}))
+                        ev.append((at + k * e.get("step", 0.6 if e["type"] == "checklist" else 1.0), "blip", {"f": 700 + k * 90}))
+                elif e.get("type") == "split":
+                    ev.append((at, "pop", {}))
+                    ev.append((at + e.get("step", 1.2), "ding", {}))
                 elif kind and kind != "none":
                     ev.append((at, kind, {}))
             for x in s.raw.get("sfx", []) or []:     # explicit: [{at: 1.2, kind: hit}]
@@ -160,4 +163,5 @@ class Timeline:
 
 
 _DEFAULT_SFX = {"headline": "whoosh_soft", "text": "blip", "bubble": "blip", "sticker": "pop",
-                "pill": "blip", "stamp": "hit", "image": "pop", "character": None, "progress_ring": None}
+                "pill": "blip", "stamp": "hit", "image": "pop", "character": None, "progress_ring": None,
+                "stat": "ding", "quote": "whoosh_soft", "photo": "whoosh_soft", "emoji": "pop"}

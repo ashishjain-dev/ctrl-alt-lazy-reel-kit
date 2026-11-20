@@ -19,6 +19,7 @@ _S = {}  # per-process state: timeline, brand, background
 def init(scenes_path, brand_path=None):
     tl = Timeline(scenes_path)
     brand = Brand.load(brand_path or tl.brand_path)
+    brand.raw["characters"] = {**brand.raw.get("characters", {}), **(tl.raw.get("characters") or {})}
     _S.update(tl=tl, brand=brand, bg=make_bg(brand, tl.W, tl.H))
 
 
@@ -57,7 +58,7 @@ def render_frame(i):
         elements.draw(c, im, el, lt)
     ln = s.line_at(lt)
     if ln and ln.subtitle and ln.text:
-        elements.subtitle(c, im, ln.text, lt - ln.start, brand.frame.get("safe_bottom", 1440) - 40)
+        elements.subtitle(c, im, ln.text, lt - ln.start, brand.frame.get("safe_bottom", 1440) - 40, ln.dur)
     # camera: punch-in on scene start / marked beats, shake on hits
     z = 1.0
     for tp in s.punch:

@@ -24,6 +24,25 @@ const moodAt = (lines: Line[], who: string, base: string, t: number) => {
   return m;
 };
 
+/** Long subtitle lines are shown ~2 lines (~56 chars) at a time, paged by elapsed time. */
+const subtitlePage = (text: string, el: number, dur: number) => {
+  const words = text.split(" ");
+  const pages: string[] = [];
+  let cur = "";
+  for (const w of words) {
+    if (cur && (cur + " " + w).replace(/\*/g, "").length > 56) { pages.push(cur); cur = w; } else cur = cur ? cur + " " + w : w;
+  }
+  if (cur) pages.push(cur);
+  // keep *highlights* balanced per page
+  let open = false;
+  const fixed = pages.map((p) => { const q = (open ? "*" : "") + p; open = (q.split("*").length - 1) % 2 === 1; return open ? q + "*" : q; });
+  if (fixed.length <= 1) return text;
+  const total = fixed.reduce((a, p) => a + p.length, 0);
+  let u = (Math.max(0, el) / dur) * total;
+  for (const p of fixed) { if (u < p.length) return p; u -= p.length; }
+  return fixed[fixed.length - 1];
+};
+
 export const Frame: React.FC<{ b: Brand; t: number; total: number }> = ({ b, t, total }) => {
   const top = b.frame.safe_top;
   return (
@@ -64,16 +83,16 @@ const SceneView: React.FC<{ s: Scene; b: Brand; t: number }> = ({ s, b, t }) => 
       {glow ? <div style={{ position: "absolute", left: gx - 520, top: gy - 520, width: 1040, height: 1040, borderRadius: "50%",
         background: `radial-gradient(circle, ${glow}55 0%, ${glow}00 70%)` }} /> : null}
       {(s.cast ?? []).map((c, i) => (
-        <Character3D key={`c${i}`} who={c.who ?? "dev"} x={c.x ?? 540} y={c.y ?? 1420} scale={c.scale ?? 1}
-          mood={moodAt(s.lines, c.who ?? "dev", c.mood ?? "neutral", t)} t={t} talk={talkAt(s.lines, c.who ?? "dev", t)}
-          colors={b.characters?.[c.who ?? "dev"]} />
+        <Character3D key={`c${i}`} who={c._base ?? "person"} x={c.x ?? 540} y={c.y ?? 1420} scale={c.scale ?? 1}
+          mood={moodAt(s.lines, c.who ?? "person", c.mood ?? "neutral", t)} t={t} talk={talkAt(s.lines, c.who ?? "person", t)}
+          colors={c._look} />
       ))}
       {(s.elements ?? []).map((el, i) => {
         if (el.until !== undefined && t >= el.until) return null;
         if (el.type === "character") {
           if (t < (el.at ?? 0)) return null;
-          return <Character3D key={i} who={el.who ?? "dev"} x={el.x ?? 540} y={el.y ?? 1420} scale={el.scale ?? 1}
-            mood={el.mood ?? "neutral"} t={t} talk={0} colors={b.characters?.[el.who ?? "dev"]} />;
+          return <Character3D key={i} who={el._base ?? "person"} x={el.x ?? 540} y={el.y ?? 1420} scale={el.scale ?? 1}
+            mood={el.mood ?? "neutral"} t={t} talk={0} colors={el._look} />;
         }
         const C = TYPES[el.type];
         return C ? <C key={i} el={el} t={t} b={b} /> : null;
@@ -82,7 +101,7 @@ const SceneView: React.FC<{ s: Scene; b: Brand; t: number }> = ({ s, b, t }) => 
         <div style={{ position: "absolute", left: 110, right: 110, top: b.frame.safe_bottom - 40, transform: "translateY(-100%)", textAlign: "center" }}>
           <span style={{ background: "#000", color: b.colors.fg, padding: "14px 28px", borderRadius: 22, lineHeight: 1.6,
             font: `700 50px/1.6 ${b.web_fonts.display}`, boxDecorationBreak: "clone", WebkitBoxDecorationBreak: "clone" }}>
-            <Rich text={line.text} b={b} />
+            <Rich text={subtitlePage(line.text, t - line.start, line.dur)} b={b} />
           </span>
         </div>
       ) : null}

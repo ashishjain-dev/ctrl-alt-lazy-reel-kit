@@ -33,7 +33,7 @@ const DEFAULT_BRAND = {
   colors: { bg_top: "#1a1622", bg_bottom: "#0c0e16", fg: "#f6f6fa", muted: "#a0a0af", accent: "#e8805c",
     highlight: "#fcce4a", good: "#7ad696", bad: "#f06056", panel: "#22222e", ink: "#121216", info: "#82aaf0" },
   frame: { progress_bar: true, watermark: true, accent_bar: true, safe_top: 280, safe_bottom: 1440, safe_right: 850 },
-  web_fonts: { display: "Inter, 'DejaVu Sans', sans-serif", mono: "'JetBrains Mono', 'DejaVu Sans Mono', monospace" },
+  web_fonts: { display: "Inter, 'DejaVu Sans', 'Noto Color Emoji', sans-serif", mono: "'JetBrains Mono', 'DejaVu Sans Mono', monospace" },
   characters: {},
 };
 const merge = (a, b) => {
@@ -43,6 +43,27 @@ const merge = (a, b) => {
 };
 const brandPath = opt("--brand") || (doc.brand ? path.resolve(base, doc.brand) : null);
 const brand = merge(DEFAULT_BRAND, brandPath && fs.existsSync(brandPath) ? yaml.load(fs.readFileSync(brandPath, "utf8")) : {});
+
+brand.characters = { ...(brand.characters || {}), ...(doc.characters || {}) };
+
+// ---- characters: resolve presets / named characters to {base, look} (mirrors characters.py) ----
+const BUILTIN = ["person", "bot", "blob"];
+const PRESETS = { dev: { base: "person", headphones: true, shirt_icon: "</>" } };
+const resolveChar = (who) => {
+  let name = who, spec = {}, n = 0;
+  while (!BUILTIN.includes(name)) {
+    const nxt = { ...(PRESETS[name] || {}), ...(brand.characters[name] || {}) };
+    if (!Object.keys(nxt).length || n++ > 5) throw new Error(`unknown character '${who}' (built-in: ${BUILTIN.join(", ")}, dev, or brand.yaml > characters)`);
+    spec = { ...nxt, ...spec };
+    name = nxt.base || "person";
+  }
+  if (BUILTIN.includes(who) && brand.characters[who]) spec = { ...brand.characters[who], ...spec };
+  delete spec.base;
+  if (typeof spec.hair === "string" && spec.hair.startsWith("#")) { spec.hair_color = spec.hair; delete spec.hair; }
+  if (spec.phones) { spec.accent = spec.phones; delete spec.phones; }
+  return { base: name, look: spec };
+};
+const withChar = (e) => { const r = resolveChar(e.who || "person"); return { ...e, _base: r.base, _look: { ...r.look, ...(e.look || {}) } }; };
 
 // ---- voices ----
 const audioCfg = doc.audio || {};
@@ -65,16 +86,17 @@ const scenes = (doc.scenes || []).map((s) => {
       const src = path.join(path.dirname(voPath), `vo_${d.voice}.wav`);
       if (fs.existsSync(src)) { fs.copyFileSync(src, path.join(PUB, "vo", `vo_${d.voice}.wav`)); audio = `vo/vo_${d.voice}.wav`; }
     }
-    lines.push({ ...d, start: lt, dur, env: hasVoice ? vo.env[d.voice] : null, audio });
+    lines.push({ who: "narrator", ...d, start: lt, dur, env: hasVoice ? vo.env[d.voice] : null, audio });
     lt += dur + (d.gap ?? gap);
   }
   const need = lines.length ? lines[lines.length - 1].start + lines[lines.length - 1].dur + (s.tail ?? 0.6) : 0;
   const dur = s.dur ?? Math.max(need, 1.0);
-  const out = { ...s, start: t, dur, lines };
+  const out = { ...s, start: t, dur, lines, cast: (s.cast || []).map(withChar),
+    elements: (s.elements || []).map((e) => (e.type === "character" ? withChar(e) : e)) };
   t += dur;
   // images: copy next to public/
   for (const e of out.elements || []) {
-    if (e.type === "image" && e.src && !/^https?:/.test(e.src)) {
+    if ((e.type === "image" || e.type === "photo") && e.src && !/^https?:/.test(e.src)) {
       const src = path.resolve(base, e.src);
       const name = `img_${path.basename(src)}`;
       fs.copyFileSync(src, path.join(PUB, name));
@@ -98,6 +120,6 @@ if (!args.includes("--no-audio")) {
 }
 
 const reel = { title: meta.title || "reel", fps, width: (meta.size || [1080, 1920])[0], height: (meta.size || [1080, 1920])[1],
-  total: t, brand, scenes, cover: doc.cover || null, audio: audioFile, voicesInMix: !!audioFile };
+  total: t, brand, scenes, cover: doc.cover && doc.cover.character ? { ...doc.cover, character: withChar(doc.cover.character) } : (doc.cover || null), audio: audioFile, voicesInMix: !!audioFile };
 fs.writeFileSync(path.join(PUB, "reel.json"), JSON.stringify(reel, null, 1));
 console.log(`public/reel.json: ${scenes.length} scenes, ${t.toFixed(2)} s @ ${fps} fps`);
