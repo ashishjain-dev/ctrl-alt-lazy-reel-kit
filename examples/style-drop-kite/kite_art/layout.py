@@ -1,8 +1,8 @@
-"""Hero scene "kite": a dragon kite cuts a rival kite above Makar Sankranti rooftops.
+"""Geometry of the kite scene: a dragon kite cuts a rival kite above Makar Sankranti rooftops.
 
 5 seconds. The cut always lands at CUT_T = 2.0 s, so every style lines up in a Style Drop.
-`layout(t)` is a pure function of time that returns plain geometry (points, angles, colours by role).
-Styles (painters) decide how each part looks; the geometry never changes between styles.
+`layout(t)` is a pure function of time that returns plain geometry (points, angles).
+The style modules next to this file decide how each part looks; the geometry never changes between styles.
 """
 import math
 import random
@@ -179,4 +179,5 @@ def layout(t):
     return {"t": t, "hero": hero, "hero_c": (hx, hy), "hero_angle": hang, "hero_s": HERO_W / 200, "sun": SUN, "tail": tail, "hero_string": hero_string,
             "rival": rival, "rival_c": (rx, ry), "rival_angle": ra, "rival_scale": rs, "rival_string": rival_string, "cut": cut,
             "birds": birds, "bg_kites": bg, "burst": burst, "cut_pt": CUT_PT, "skyline": SKYLINE,
-            "shout": t >= CUT_T + 0.25, "shout_t": t - CUT_T - 0.25, "shout_xy": (540, 330)}
+            "shout": t >= CUT_T + 0.25, "shout_t": t - CUT_T - 0.25, "shout_xy": (540, 330),
+            "project": "Kaipoche", "note": "Makar Sankranti", "seal": "KITE"}

@@ -26,6 +26,11 @@ GRID_CROP = (0, 240, 1080, 1680)      # 3:4 centre crop (1080x1440)
 def cover(spec, brand, out):
     im = make_bg(brand, W, H)
     c = Cv(im, brand)
+    pt = None
+    if brand.raw.get("_style"):
+        from .art import style_class
+        pt = style_class(brand.raw["_style"])(c, im)
+        pt.reel_background()
     glow(im, elements.col(c, spec.get("glow", "accent")), 540, 1150, 520, 0.5)
     if spec.get("tag"):
         c.rr([70, 450, 70 + c.tw(spec["tag"], 44, "display") + 50, 520], 20, fill=brand.c["accent"])
@@ -44,6 +49,8 @@ def cover(spec, brand, out):
     if ch:
         characters.draw(c, ch.get("who", "bot"), ch.get("x", 740), ch.get("y", 1560), ch.get("scale", 0.95),
                         ch.get("mood", "smug"), 0.4, 0, brand.raw.get("characters", {}), ch.get("look"))
+    if pt:
+        pt.reel_overlay()
     out_im = im.resize((W, H), Image.LANCZOS)
     d = ImageDraw.Draw(out_im)
     if brand.frame.get("accent_bar", True):
@@ -76,7 +83,13 @@ def from_yaml(path, out, brand_path=None):
     base = os.path.dirname(os.path.abspath(path))
     bp = brand_path or (os.path.join(base, d["brand"]) if d.get("brand") else None)
     brand = Brand.load(bp)
-    brand.raw["characters"] = {**brand.raw.get("characters", {}), **(d.get("characters") or {})}
+    from .custom import resolve_files
+    brand.raw["characters"] = {**resolve_files(brand.raw.get("characters"), os.path.dirname(os.path.abspath(bp)) if bp else base),
+                               **resolve_files(d.get("characters"), base)}
+    if d.get("style"):
+        from .art import style_class
+        brand.c.update(style_class(d["style"]).brand)
+        brand.raw["_style"] = d["style"]
     return cover(spec, brand, out)
 
 

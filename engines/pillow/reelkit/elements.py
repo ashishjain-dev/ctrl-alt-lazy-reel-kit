@@ -446,13 +446,12 @@ def subtitle(c, im, text_, t_line, brand_y=1340, dur=None, max_lines=2):
                    c.b.c["highlight"], c.b.c["ink"], "m")
 
 
-def scene(c, im, el, t):
-    """A full-frame hero scene painted in an art style: {type: scene, name: kite, style: fish-scale-folk, offset: 0}."""
-    from .art import draw_scene
+def custom(c, im, el, t):
+    """Art written for this video: {type: custom, file: my_scene.py, args: {...}} (see custom.py)."""
     if t < el.get("at", 0):
         return
-    draw_scene(c, im, el.get("name", "kite"), el.get("style") or c.b.raw.get("_style") or "flat",
-               t - el.get("at", 0) + el.get("offset", 0))
+    from .custom import draw_element
+    draw_element(c, im, el, t - el.get("at", 0))
 
 
 def drop_frame(c, im, el, t):
@@ -469,7 +468,7 @@ TYPES = {
     "headline": headline, "text": text, "terminal": terminal, "bubble": bubble, "sticker": sticker,
     "pill": pill, "checklist": checklist, "stamp": stamp, "image": image, "character": character,
     "progress_ring": progress_ring, "stat": stat, "quote": quote, "split": split, "photo": photo,
-    "list": numbered, "emoji": emoji_el, "scene": scene, "drop_frame": drop_frame, "drop_outro": drop_outro,
+    "list": numbered, "emoji": emoji_el, "custom": custom, "drop_frame": drop_frame, "drop_outro": drop_outro,
 }
 
 

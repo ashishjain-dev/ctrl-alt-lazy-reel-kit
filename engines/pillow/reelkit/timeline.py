@@ -65,7 +65,11 @@ class Scene:
             mine = [ln for ln in self.lines if ln.who == who]
             el["_talk"] = (lambda ls: lambda tt: max([ln.talk(tt) for ln in ls] or [0.0]))(mine)
             el["_mood_at"] = self._mood_fn(who, el.get("mood", "neutral"))
-            self.elements.insert(0, el)
+            # cast stands in front of custom backgrounds (leading `custom` elements), behind everything else
+            pos = 0
+            while pos < len(self.elements) and self.elements[pos].get("type") == "custom":
+                pos += 1
+            self.elements.insert(pos, el)
         self.shakes = list(d.get("shake", []))
         self.punch = ([] if d.get("no_punch") else [0.0]) + list(d.get("punch", []))
         for e in self.elements:
@@ -110,6 +114,7 @@ class Timeline:
         self.vo_dir = os.path.dirname(vo_path)
         if self.raw.get("style_drop"):          # one scene in N art styles -> generated card scenes
             from .art.drop import build_scenes
+            self.raw["style_drop"]["_base"] = self.base
             self.raw["scenes"] = build_scenes(self.raw["style_drop"]) + list(self.raw.get("scenes") or [])
             self.raw.setdefault("meta", {}).setdefault("clean", True)
         self.scenes = []
