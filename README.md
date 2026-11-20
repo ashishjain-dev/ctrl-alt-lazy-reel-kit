@@ -11,12 +11,19 @@ Tell Claude what the video is about. It asks a few questions (topic, audience, s
 - **Narrated explainers**: a voice-over with subtitles over stats, lists, photos and myth-vs-fact cards
 - **Character skits and stories**: characters talking with lip sync, from your own voice or an AI voice
 - **Top-N lists, before/after, quotes, countdowns**, plus a cover and a preview of your profile grid
+- **Style Drops**: one animated scene in several art styles, cut into a "which style wins?" reel
 
 ## Characters
 
 Pick a built-in character or design your own (hair, skin tone, outfit, hat, glasses, beard, shirt text), then save it in `brand.yaml` so the whole series uses the same cast. Each one has 9–11 moods.
 
 ![Characters](docs/img/characters.jpg)
+
+## Art styles and Style Drops
+
+Five original art styles, each inspired by a traditional or familiar art form: **Fish-Scale Folk**, **Rice Paper**, **Mud Wall**, **Cyan Plan** and **Cut Card**. Use one on a single hero scene, put several side by side in a Style Drop reel, or re-skin any reel with `style: mud-wall`. The built-in hero scene: a dragon kite cuts a rival kite on a Makar Sankranti rooftop, with the cut landing at 2.0 s in every style.
+
+![The kite scene at the moment of the cut, in all 5 styles](docs/img/style-drop-kite.jpg)
 
 ## Skills
 
@@ -26,6 +33,7 @@ Pick a built-in character or design your own (hair, skin tone, outfit, hat, glas
 | [`reel-planner`](skills/reel-planner/SKILL.md) | Fact check, ranked hooks, timed beat sheet, cover and caption. Nothing renders until you say go ahead |
 | [`text-reel`](skills/text-reel/SKILL.md) | Tips, tutorials, narrated explainers, lists, myth vs fact |
 | [`dialogue-skit`](skills/dialogue-skit/SKILL.md) | Character skits and stories with voices and lip sync |
+| [`style-drop`](skills/style-drop/SKILL.md) | One scene in many art styles, cut into one reel; also how to add new styles and scenes |
 | [`reel-cover-grid`](skills/reel-cover-grid/SKILL.md) | Cover image + 3:4 profile-grid preview |
 
 **Install:**
@@ -50,6 +58,7 @@ Then ask, for example: *"Make a 25-second reel about 3 budgeting mistakes, with 
 |---|---|---|
 | Needs | Python 3.9+, ffmpeg | + Node 18+, headless Chrome |
 | Characters | flat 2D | 3D (same looks and moods) |
+| Art styles + Style Drop | yes | not yet |
 | Install | `pip` packages only | + `npm install` (~250 MB) |
 | Licence | MIT | Remotion: paid licence for larger companies ([terms](https://www.remotion.dev/license)) |
 
@@ -90,17 +99,17 @@ scenes:
       - {type: emoji, char: "💦", at: 1.6, y: 1250, size: 160}
 ```
 
-Examples: [`money-tip`](examples/money-tip/scenes.yaml) (stat, list, quote), [`fitness-myths`](examples/fitness-myths/scenes.yaml) (narrator, myth vs fact, custom character), [`dialogue-skit`](examples/dialogue-skit/scenes.yaml) (two characters talking), [`text-reel`](examples/text-reel/scenes.yaml) (tech tip with a terminal).
+Examples: [`style-drop-kite`](examples/style-drop-kite/scenes.yaml) (one scene, 5 art styles), [`money-tip`](examples/money-tip/scenes.yaml) (stat, list, quote), [`fitness-myths`](examples/fitness-myths/scenes.yaml) (narrator, myth vs fact, custom character), [`dialogue-skit`](examples/dialogue-skit/scenes.yaml) (two characters talking), [`text-reel`](examples/text-reel/scenes.yaml) (tech tip with a terminal).
 
 The Remotion + Three.js engine is documented in [engines/remotion/README.md](engines/remotion/README.md).
 
 ## What's in the box
 
 ```
-skills/            5 Claude skills (SKILL.md each)
+skills/            6 Claude skills (SKILL.md each)
 engines/pillow/    reelkit: Python engine + CLI (render, stills, audio, cover, grid, characters, voices, timing, check)
 engines/remotion/  optional Remotion + Three.js engine (same scenes.yaml, 3D characters)
-examples/          money-tip, fitness-myths, dialogue-skit, text-reel
+examples/          style-drop-kite, money-tip, fitness-myths, dialogue-skit, text-reel
 docs/              scenes.yaml reference, preview images
 brand.example.yaml
 ```

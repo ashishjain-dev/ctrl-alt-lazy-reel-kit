@@ -1,0 +1,21 @@
+# Style Drop: one hero scene (a dragon kite cuts a rival kite at Makar Sankranti) in 5 art styles.
+#   reelkit stills examples/style-drop-kite/scenes.yaml -o stills/f
+#   reelkit render examples/style-drop-kite/scenes.yaml -o style-drop.mp4
+# One style on its own (5 s clip): reelkit render examples/style-drop-kite/clip.yaml -o clip.mp4
+meta: {title: "kite-style-drop", fps: 30}
+audio:
+  music: {mood: upbeat, volume: 0.5}
+
+style_drop:
+  scene: kite
+  styles: [fish-scale-folk, rice-paper, mud-wall, cyan-plan, cut-card]
+  title: ["5 kite styles", "one Makar Sankranti cut"]
+  card_dur: 2.0
+  clip_offset: 1.05          # the cut (2.0 s into the clip) lands 0.95 s into each card
+  outro: 3.0
+  cta: "COMMENT 'KITE'\nFOR THE PROMPTS"
+  bg: "#f4ecdc"
+
+cover:
+  headline: "One kite fight, *5 art styles*"
+  sub: "which one is your favourite?"

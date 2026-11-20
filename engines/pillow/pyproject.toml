@@ -14,4 +14,4 @@ dependencies = ["pillow>=10", "numpy>=1.24", "pyyaml>=6"]
 reelkit = "reelkit.__main__:main"
 
 [tool.setuptools]
-packages = ["reelkit"]
+packages = ["reelkit", "reelkit.art"]

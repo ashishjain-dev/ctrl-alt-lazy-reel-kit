@@ -440,17 +440,36 @@ def subtitle(c, im, text_, t_line, brand_y=1340, dur=None, max_lines=2):
     h = lh * len(lines) + 40
     y0 = brand_y - h
     w = max(c.tw(ln.replace("*", ""), size, "bold") for ln in lines) + 60
-    c.rr([540 - w / 2, y0, 540 + w / 2, y0 + h], 22, fill=(0, 0, 0))
+    c.rr([540 - w / 2, y0, 540 + w / 2, y0 + h], 22, fill=c.b.c.get("sub_bg", (0, 0, 0)))
     for i, ln in enumerate(lines):
-        _rich_line(c, 540, y0 + 20 + lh * i + lh / 2, ln, size, "bold", c.b.c["fg"],
+        _rich_line(c, 540, y0 + 20 + lh * i + lh / 2, ln, size, "bold", c.b.c.get("sub_fg", c.b.c["fg"]),
                    c.b.c["highlight"], c.b.c["ink"], "m")
+
+
+def scene(c, im, el, t):
+    """A full-frame hero scene painted in an art style: {type: scene, name: kite, style: fish-scale-folk, offset: 0}."""
+    from .art import draw_scene
+    if t < el.get("at", 0):
+        return
+    draw_scene(c, im, el.get("name", "kite"), el.get("style") or c.b.raw.get("_style") or "flat",
+               t - el.get("at", 0) + el.get("offset", 0))
+
+
+def drop_frame(c, im, el, t):
+    from .art import drop
+    drop.drop_frame(c, im, el, t)
+
+
+def drop_outro(c, im, el, t):
+    from .art import drop
+    drop.drop_outro(c, im, el, t)
 
 
 TYPES = {
     "headline": headline, "text": text, "terminal": terminal, "bubble": bubble, "sticker": sticker,
     "pill": pill, "checklist": checklist, "stamp": stamp, "image": image, "character": character,
     "progress_ring": progress_ring, "stat": stat, "quote": quote, "split": split, "photo": photo,
-    "list": numbered, "emoji": emoji_el,
+    "list": numbered, "emoji": emoji_el, "scene": scene, "drop_frame": drop_frame, "drop_outro": drop_outro,
 }
 
 

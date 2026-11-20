@@ -17,4 +17,5 @@ npm run cover  -- ../../out/cover.png
 - **Headless Chrome:** Remotion downloads one on first render. On locked-down machines pass `--browser-executable=/path/to/chrome`. Servers without a GPU: add `--gl=swangle` (WebGL in software; slower).
 - **Fonts:** CSS families from `brand.yaml > web_fonts` (default `Inter`, then DejaVu). Install them on the machine, or load web fonts in `src/Root.tsx`.
 - Characters: `src/Character3D.tsx` (`Person3D`, `Bot3D`, `Blob3D`). Same names, look options and moods as the 2D versions; `prep` resolves presets and named characters from brand.yaml / scenes.yaml. (`shirt_icon` text is 2D-only for now.)
+- Not yet supported here: art styles (`style:`), the `scene` element and Style Drop reels. Render those with the Pillow engine.
 - Emoji use the system colour emoji font (built in on macOS/Windows; Linux: `apt install fonts-noto-color-emoji`).

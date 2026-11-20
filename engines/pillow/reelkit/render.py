@@ -20,7 +20,14 @@ def init(scenes_path, brand_path=None):
     tl = Timeline(scenes_path)
     brand = Brand.load(brand_path or tl.brand_path)
     brand.raw["characters"] = {**brand.raw.get("characters", {}), **(tl.raw.get("characters") or {})}
-    _S.update(tl=tl, brand=brand, bg=make_bg(brand, tl.W, tl.H))
+    style = tl.raw.get("style") or (tl.raw.get("meta") or {}).get("style")
+    painter = None
+    if style:                           # art-style preset for the whole reel: colours, background, overlay
+        from .art import style_class
+        painter = style_class(style)
+        brand.c.update(painter.brand)
+        brand.raw["_style"] = style
+    _S.update(tl=tl, brand=brand, bg=make_bg(brand, tl.W, tl.H), painter=painter)
 
 
 def _frame_overlay(out, brand, t, total, W):
@@ -52,10 +59,17 @@ def render_frame(i):
     lt = t - s.start
     im = _S["bg"].copy()
     c = Cv(im, brand)
+    painter = _S.get("painter")
+    pt = painter(c, im) if painter else None
+    if pt:
+        pt.t = t
+        pt.reel_background()
     if s.glow:
         glow(im, elements.col(c, s.glow), *(s.raw.get("glow_at", [540, 900])))
     for el in s.elements:
         elements.draw(c, im, el, lt)
+    if pt:
+        pt.reel_overlay()
     ln = s.line_at(lt)
     if ln and ln.subtitle and ln.text:
         elements.subtitle(c, im, ln.text, lt - ln.start, brand.frame.get("safe_bottom", 1440) - 40, ln.dur)
@@ -76,6 +90,9 @@ def render_frame(i):
     cx = min(max(W * K / 2 + sx * K, cw / 2), W * K - cw / 2)
     cy = min(max(H * K / 2 + sy * K, ch / 2), H * K - ch / 2)
     out = im.resize((W, H), Image.LANCZOS, box=(cx - cw / 2, cy - ch / 2, cx + cw / 2, cy + ch / 2))
+    meta = tl.raw.get("meta", {}) or {}
+    if meta.get("clean"):              # clean clip: no label/handle/progress bar, no fades (Style Drop clips)
+        return out.tobytes()
     _frame_overlay(out, brand, t, tl.total, W)
     if t < 0.08 or t > tl.total - 0.25:
         k = min(1, t / 0.08) if t < 0.08 else max(0, (tl.total - t) / 0.25)

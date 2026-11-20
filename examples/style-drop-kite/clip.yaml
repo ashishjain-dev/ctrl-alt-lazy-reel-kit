@@ -1,0 +1,11 @@
+# One 5-second clip of the hero scene in a single style (change `style:` to any of the 5).
+meta: {title: "kite-clip", fps: 30, clean: true}
+audio: {music: {mood: upbeat, volume: 0.45}, sfx: false}
+scenes:
+  - name: kite
+    dur: 5
+    no_punch: true
+    whoosh: false
+    sfx: [{at: 2.0, kind: hit}]
+    elements:
+      - {type: scene, name: kite, style: fish-scale-folk, sfx: none}
