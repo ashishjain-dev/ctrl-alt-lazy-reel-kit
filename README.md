@@ -1,83 +1,112 @@
 # ctrl-alt-lazy-reel-kit
 
-**Claude skills + a small engine that turn a YAML script into a ready-to-post vertical video** (Instagram Reels, YouTube Shorts, TikTok): animated text, typed terminals, two original characters that talk with lip sync, burned-in subtitles, generated music and SFX, a cover and a profile-grid preview.
+**Make short vertical videos (Instagram Reels, YouTube Shorts, TikTok) with Claude, for any topic.**
+Tell Claude what the video is about. It asks a few questions (topic, audience, script, voice, characters), writes the script if you don't have one, and renders a ready-to-post MP4 plus a cover. No video editor needed, and no stock assets to license: the music, sound effects and characters are all generated from code.
 
-Write the script (or let Claude write it), check the stills, render. Two engines read the same script:
+![Fitness and money examples](docs/img/any-niche.jpg)
 
-| | **Pillow + ffmpeg** (default) | **Remotion + Three.js** (optional) |
-|---|---|---|
-| Needs | Python 3.9+, ffmpeg | + Node 18+, headless Chrome |
-| Characters | flat 2D | 3D (Three.js primitives) |
-| Install | `pip` packages only | + `npm install` (~250 MB) |
-| Licence | MIT | Remotion: paid licence for larger companies ([terms](https://www.remotion.dev/license)) |
+## What you can make
 
-![Text reel, Pillow engine](docs/img/pillow-text-reel.jpg)
-![Dialogue skit: Pillow (left two) vs Remotion + Three.js (right two)](docs/img/skit-pillow-vs-remotion.jpg)
+- **Tips and tutorials**: headlines, steps, checklists, a typed terminal for code
+- **Narrated explainers**: a voice-over with subtitles over stats, lists, photos and myth-vs-fact cards
+- **Character skits and stories**: characters talking with lip sync, from your own voice or an AI voice
+- **Top-N lists, before/after, quotes, countdowns**, plus a cover and a preview of your profile grid
+
+## Characters
+
+Pick a built-in character or design your own (hair, skin tone, outfit, hat, glasses, beard, shirt text), then save it in `brand.yaml` so the whole series uses the same cast. Each one has 9–11 moods.
+
+![Characters](docs/img/characters.jpg)
 
 ## Skills
 
 | Skill | Use it for |
 |---|---|
-| [`reel-planner`](skills/reel-planner/SKILL.md) | topic check, ranked hooks, timed beat sheet, cover, caption; asks for a go-ahead before anything is rendered |
-| [`text-reel`](skills/text-reel/SKILL.md) | tutorials and tips: headlines, terminal, checklists, stickers, music + SFX |
-| [`dialogue-skit`](skills/dialogue-skit/SKILL.md) | two-character comedy skits with recorded or ElevenLabs voices and lip sync |
-| [`reel-cover-grid`](skills/reel-cover-grid/SKILL.md) | cover image + 3:4 profile-grid preview |
+| [`make-video`](skills/make-video/SKILL.md) | **Start here.** Asks about the topic, audience, script, audio, characters and engine, then builds the video |
+| [`reel-planner`](skills/reel-planner/SKILL.md) | Fact check, ranked hooks, timed beat sheet, cover and caption. Nothing renders until you say go ahead |
+| [`text-reel`](skills/text-reel/SKILL.md) | Tips, tutorials, narrated explainers, lists, myth vs fact |
+| [`dialogue-skit`](skills/dialogue-skit/SKILL.md) | Character skits and stories with voices and lip sync |
+| [`reel-cover-grid`](skills/reel-cover-grid/SKILL.md) | Cover image + 3:4 profile-grid preview |
 
-Every rendering skill asks which engine to use, and defaults to Pillow.
+**Install:**
+- **Claude Code:** `cp -r skills/* ~/.claude/skills/` (or into `.claude/skills/` inside a project).
+- **Claude apps (claude.ai / desktop):** zip a skill folder (e.g. `skills/make-video`) and upload it in Settings, in the Skills section.
 
-### Install the skills
+Then ask, for example: *"Make a 25-second reel about 3 budgeting mistakes, with a narrator and a cute mascot"*, or *"Make a skit where a chef and a robot argue about pineapple on pizza"*.
 
-- **Claude Code:** copy the folders into your skills directory, e.g. `cp -r skills/* ~/.claude/skills/` (or `.claude/skills/` inside a project).
-- **Claude apps (claude.ai / desktop):** zip one skill folder (e.g. `skills/text-reel`) and upload it in Settings, in the Skills section.
+## Voice options
 
-Then just ask: *"Make a text reel about git rebase vs merge"* or *"Plan a skit about a PM's small change at 6:58 PM"*.
+| Option | Cost | How |
+|---|---|---|
+| No voice: music + sound effects | free | default for tips |
+| Your own voice | free | `reelkit voices script` prints the lines; record them; `reelkit voices split` cuts the file |
+| ElevenLabs | paid credits | `ELEVENLABS_API_KEY` + `reelkit voices tts` |
+| OpenAI TTS | paid | `OPENAI_API_KEY` + `reelkit voices tts --provider openai` |
+| Built-in voice (macOS `say`, `espeak-ng`) | free, robotic | `reelkit voices tts --provider say` |
 
-## Use the engine directly
+## Two engines, same script
+
+| | **Pillow + ffmpeg** (default) | **Remotion + Three.js** (optional) |
+|---|---|---|
+| Needs | Python 3.9+, ffmpeg | + Node 18+, headless Chrome |
+| Characters | flat 2D | 3D (same looks and moods) |
+| Install | `pip` packages only | + `npm install` (~250 MB) |
+| Licence | MIT | Remotion: paid licence for larger companies ([terms](https://www.remotion.dev/license)) |
+
+![Same skit: Pillow (left two) vs Remotion + Three.js (right two)](docs/img/skit-pillow-vs-remotion.jpg)
+
+## Use it without Claude
 
 ```bash
 git clone --depth 1 https://github.com/ashishjain-dev/ctrl-alt-lazy-reel-kit && cd ctrl-alt-lazy-reel-kit
 pip install -e engines/pillow          # use a venv, or add --break-system-packages
-reelkit check                          # ffmpeg + fonts (Inter/DejaVu; any TTF/OTF works)
+reelkit check                          # ffmpeg, fonts, emoji font, available voices
 
-cp brand.example.yaml brand.yaml       # your handle, colours, fonts
-reelkit stills examples/text-reel/scenes.yaml -o stills/f    # quick visual check + contact sheet
-reelkit render examples/text-reel/scenes.yaml -o reel.mp4
-reelkit cover  examples/text-reel/scenes.yaml -o cover.png
+cp brand.example.yaml brand.yaml       # your handle, colours, characters
+reelkit characters -o characters.png   # see every character, look and mood
+reelkit stills examples/money-tip/scenes.yaml -o stills/f    # quick visual check + contact sheet
+reelkit render examples/money-tip/scenes.yaml -o reel.mp4
+reelkit cover  examples/money-tip/scenes.yaml -o cover.png
 ```
 
-Remotion + Three.js: see [engines/remotion/README.md](engines/remotion/README.md).
-Every scenes.yaml key: [docs/scenes-reference.md](docs/scenes-reference.md).
+A video is one YAML file ([full reference](docs/scenes-reference.md)):
 
 ```yaml
+brand: brand.yaml
+characters:
+  coach: {base: person, hair: bald, beard: true, shirt_icon: "FIT"}
 scenes:
   - name: hook
-    dur: 3.0
     elements:
-      - {type: headline, text: "Your git log is a *crime scene*"}
-      - {type: terminal, at: 0.5, lines: ["a1f3 fix", "9c2e fix again", "e4b1 asdfgh"]}
-      - {type: stamp, text: "WHO DID THIS", at: 2.0, y: 1180}
-  - name: punch
-    cast:
-      - {who: dev, x: 300, y: 1170, scale: 0.78}
-      - {who: bot, x: 790, y: 1170, scale: 0.72}
+      - {type: headline, text: "You *can't* burn belly fat with crunches"}
+      - {type: character, who: coach, mood: smug, y: 1150, scale: 0.75}
     dialogue:
-      - {who: dev, voice: d1, text: "How small is the change?", mood: sad}
-      - {who: bot, voice: b1, text: "Database. Region. *Tonight.*", mood: deadpan}
+      - {who: narrator, voice: n1, text: "Crunches won't burn belly fat. Here's why."}
+  - name: myth
+    elements:
+      - type: split
+        left: {title: "MYTH", text: "More sweat = more *fat* burned"}
+        right: {title: "FACT", text: "Sweat is *cooling*, not burning"}
+      - {type: emoji, char: "💦", at: 1.6, y: 1250, size: 160}
 ```
+
+Examples: [`money-tip`](examples/money-tip/scenes.yaml) (stat, list, quote), [`fitness-myths`](examples/fitness-myths/scenes.yaml) (narrator, myth vs fact, custom character), [`dialogue-skit`](examples/dialogue-skit/scenes.yaml) (two characters talking), [`text-reel`](examples/text-reel/scenes.yaml) (tech tip with a terminal).
+
+The Remotion + Three.js engine is documented in [engines/remotion/README.md](engines/remotion/README.md).
 
 ## What's in the box
 
 ```
-skills/            4 Claude skills (SKILL.md each)
-engines/pillow/    reelkit: Python engine + CLI (render, stills, audio, cover, grid, voices, timing, check)
-engines/remotion/  optional Remotion + Three.js engine (same scenes.yaml)
-examples/          text-reel and dialogue-skit scripts
-docs/              scenes.yaml reference
+skills/            5 Claude skills (SKILL.md each)
+engines/pillow/    reelkit: Python engine + CLI (render, stills, audio, cover, grid, characters, voices, timing, check)
+engines/remotion/  optional Remotion + Three.js engine (same scenes.yaml, 3D characters)
+examples/          money-tip, fitness-myths, dialogue-skit, text-reel
+docs/              scenes.yaml reference, preview images
 brand.example.yaml
 ```
 
-Everything you see is generated: the music and SFX come from numpy, the characters are drawn from code. No samples or stock assets to license. Fonts are your system's (Inter and DejaVu are free under the SIL OFL / Bitstream licences).
+Fonts come from your system: Inter and DejaVu by default (both free; any TTF/OTF works), plus a colour emoji font if you use emoji. Use photos and logos you own or have the rights to.
 
 ## Credits
 
-Made by [@ctrl.alt.lazy](https://instagram.com/ctrl.alt.lazy), Claude tips for lazy devs. MIT licensed. PRs welcome: new element types, characters, music moods.
+Made by [@ctrl.alt.lazy](https://instagram.com/ctrl.alt.lazy). MIT licensed. PRs welcome: new elements, characters, music moods, examples for your niche.

@@ -1,0 +1,47 @@
+# General-audience example: a money tip with a big stat, a top-3 list and a quote card.
+# Text-only reel: no voices, music + SFX only. (Not financial advice; a starting point.)
+meta: {title: "50-30-20", fps: 60}
+brand: ../../brand.example.yaml
+audio:
+  music: {mood: chill}
+
+characters:
+  maya: {base: person, hair: long, hair_color: "#6b3e26", skin: "#c68c64", shirt: "#e8805c", glasses: true}
+
+cover:
+  headline: "Where does your *salary* go?"
+  sub: "the 50/30/20 starting point"
+  character: {who: maya, mood: think, x: 760, y: 1640, scale: 0.85}
+
+scenes:
+  - name: hook
+    dur: 3.2
+    glow: bad
+    elements:
+      - {type: headline, text: "Payday → broke by the *20th?*", y: 430}
+      - {type: character, who: maya, mood: shocked, x: 540, y: 1400, scale: 0.85}
+      - {type: emoji, char: "💸", at: 0.8, x: 820, y: 760, size: 150, angle: -12}
+
+  - name: rule
+    dur: 4.0
+    elements:
+      - {type: headline, text: "Try the *50/30/20* split", y: 430}
+      - {type: stat, value: "50%", label: "needs: rent, food, bills", at: 0.3, y: 760, size: 200}
+      - {type: text, text: "*30%* wants  ·  *20%* savings", at: 1.8, y: 1180, size: 56}
+
+  - name: steps
+    dur: 5.4
+    glow: good
+    elements:
+      - {type: headline, text: "Make it *automatic*", y: 430}
+      - type: list
+        at: 0.3
+        step: 1.3
+        y: 640
+        items: ["Move the *20%* on payday", "Pay the *50%* bills next", "Spend the *30%* guilt-free"]
+
+  - name: quote
+    dur: 3.6
+    elements:
+      - {type: quote, text: "Pay yourself *first*, then pay everyone else.", author: "old money advice", at: 0.2, y: 620}
+      - {type: pill, text: "Save this for payday", at: 1.6, y: 1150}

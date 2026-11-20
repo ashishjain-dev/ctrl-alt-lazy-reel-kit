@@ -43,7 +43,7 @@ def cover(spec, brand, out):
     ch = spec.get("character")
     if ch:
         characters.draw(c, ch.get("who", "bot"), ch.get("x", 740), ch.get("y", 1560), ch.get("scale", 0.95),
-                        ch.get("mood", "smug"), 0.4, 0, brand.raw.get("characters", {}).get(ch.get("who", "bot")))
+                        ch.get("mood", "smug"), 0.4, 0, brand.raw.get("characters", {}), ch.get("look"))
     out_im = im.resize((W, H), Image.LANCZOS)
     d = ImageDraw.Draw(out_im)
     if brand.frame.get("accent_bar", True):
@@ -75,7 +75,9 @@ def from_yaml(path, out, brand_path=None):
     spec = d.get("cover", d)
     base = os.path.dirname(os.path.abspath(path))
     bp = brand_path or (os.path.join(base, d["brand"]) if d.get("brand") else None)
-    return cover(spec, Brand.load(bp), out)
+    brand = Brand.load(bp)
+    brand.raw["characters"] = {**brand.raw.get("characters", {}), **(d.get("characters") or {})}
+    return cover(spec, brand, out)
 
 
 _ = K  # re-exported for users who draw custom covers

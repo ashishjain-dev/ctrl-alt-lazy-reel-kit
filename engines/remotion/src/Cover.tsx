@@ -21,8 +21,8 @@ export const CoverStill: React.FC<{ reel: Reel }> = ({ reel }) => {
         <Rich text={c.headline} b={b} />
         {c.sub ? <div style={{ font: `700 50px ${b.web_fonts.display}`, color: b.colors.muted, marginTop: 24 }}>{c.sub}</div> : null}
       </div>
-      {ch ? <Character3D who={ch.who ?? "bot"} x={ch.x ?? 740} y={ch.y ?? 1560} scale={ch.scale ?? 0.95} mood={ch.mood ?? "smug"} t={0.4} talk={0}
-        colors={b.characters?.[ch.who ?? "bot"]} /> : null}
+      {ch ? <Character3D who={ch._base ?? "bot"} x={ch.x ?? 740} y={ch.y ?? 1560} scale={ch.scale ?? 0.95} mood={ch.mood ?? "smug"} t={0.4} talk={0}
+        colors={ch._look} /> : null}
       {b.handle ? <div style={{ position: "absolute", left: 0, right: 0, top: 1590, textAlign: "center", color: b.colors.muted,
         font: `700 34px ${b.web_fonts.display}` }}>{b.handle}</div> : null}
     </AbsoluteFill>

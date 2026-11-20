@@ -5,15 +5,15 @@ description: Plan a short-form video (Reel, Short, TikTok) before production - t
 
 # Reel planner
 
-Turns a topic into a plan the creator can approve in one read. Output is plain text in chat; nothing gets rendered until the user says go ahead. Works with any production method; pairs with the `text-reel` and `dialogue-skit` skills from https://github.com/ashishjain-dev/ctrl-alt-lazy-reel-kit.
+Turns a topic into a plan the creator can approve in one read. Output is plain text in chat; nothing gets rendered until the user says go ahead. Works for any niche and any production method; pairs with the `make-video`, `text-reel` and `dialogue-skit` skills from https://github.com/ashishjain-dev/ctrl-alt-lazy-reel-kit.
 
 ## Inputs (ask only for what's missing and matters)
 
-Topic · format (tutorial/tip → text-reel, comedy/skit → dialogue-skit) · audience and their level · page tone (deadpan, hype, calm…) · target length · anything that must be in it. If the user has past results (views, watch time, shares), ask for the top 3 and bottom 3 reels: they beat any generic rule below.
+Topic · niche (tech, fitness, food, finance, education, business, travel…) · format (tip/tutorial/explainer → text-reel, skit/story → dialogue-skit) · audience and their level · language · page tone (deadpan, hype, calm, warm…) · target length · anything that must be in it. If the user has past results (views, watch time, shares), ask for the top 3 and bottom 3 reels: they beat any generic rule below.
 
 ## Steps
 
-1. **Check the facts.** For anything technical or time-sensitive (versions, flags, prices, features), verify against current official docs before writing it into a script. Say what you checked.
+1. **Check the facts.** For anything factual or time-sensitive (numbers, health, money, law, prices, versions, features), verify against reliable current sources before writing it into a script, and keep claims modest. Say what you checked. Never invent statistics or quotes: every number on screen needs a source the user can see, and quotes are attributed only when real. Health, money and legal topics get a short "not professional advice" line in the caption.
 2. **One idea.** Write the single sentence the viewer should remember. If you need two, it's two reels.
 3. **Hooks: write 5, rank them.** Each must work with the sound off, land in ≤ 2 s and create a gap (a pain, a bold claim, a result, a "you're doing X wrong"). Ban: greetings, "in this video", "stop scrolling", questions with obvious answers. Mark your pick and why.
 4. **Beat sheet with timings** (target 15–35 s for skits, 25–45 s for tutorials):

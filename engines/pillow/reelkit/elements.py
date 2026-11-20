@@ -4,6 +4,7 @@ from scene start). Every draw function gets (c, im, el, t) where t is the scene-
 Colours accept brand keys (fg, muted, accent, highlight, good, bad, panel, ink, info) or "#rrggbb".
 Text marked with *stars* is highlighted (headline, text, bubble).
 """
+import math
 import os
 
 from PIL import Image
@@ -249,9 +250,9 @@ def character(c, im, el, t):
     if el.get("enter_from"):
         x = lerp(el["enter_from"], x, back_out(u))
     talk = el.get("_talk", lambda tt: 0.0)(t)
-    characters.draw(c, el.get("who", "dev"), x, el.get("y", 1420), el.get("scale", 1.0),
+    characters.draw(c, el.get("who", "person"), x, el.get("y", 1420), el.get("scale", 1.0),
                     el.get("_mood_at", lambda tt: el.get("mood", "neutral"))(t), t, talk,
-                    c.b.raw.get("characters", {}).get(el.get("who", "dev")))
+                    c.b.raw.get("characters", {}), el.get("look"))
 
 
 def progress_ring(c, im, el, t):
@@ -266,10 +267,175 @@ def progress_ring(c, im, el, t):
     c.text((x, y), el.get("text", f"{int(u * 100)}%"), r * 0.5, "display")
 
 
-def subtitle(c, im, text_, t_line, brand_y=1340):
-    """Burned-in subtitle used by dialogue lines."""
+def stat(c, im, el, t):
+    """Big number that counts up: value "73%", "$1,200", "3x"; label under it."""
+    t0 = el.get("at", 0)
+    u = pop(t, t0, 0.35)
+    if u is None:
+        return
+    import re
+    val = str(el.get("value", "100%"))
+    m = re.search(r"[\d][\d,]*\.?\d*", val)
+    shown = val
+    if m and el.get("count_up", True):
+        num = float(m.group().replace(",", ""))
+        k = smooth((t - t0) / el.get("count_dur", 0.9))
+        dec = len(m.group().split(".")[1]) if "." in m.group() else 0
+        cur = num * k
+        txt = f"{cur:,.{dec}f}" if "," in m.group() else f"{cur:.{dec}f}"
+        shown = val[:m.start()] + txt + val[m.end():]
+    x, y = el.get("x", 540), el.get("y", 860)
+    size = el.get("size", 220)
+    c.text((x, y + (1 - u) * 60), shown, size, "display", col(c, el.get("color"), "accent"))
+    if el.get("label"):
+        lsize = el.get("label_size", 50)
+        for i, ln in enumerate(c.wrap(el["label"], lsize, "bold", el.get("w", 900))):
+            _rich_line(c, x, y + size * 0.75 + i * lsize * 1.3 + (1 - u) * 60, ln, lsize, "bold", c.b.c["fg"],
+                       c.b.c["highlight"], c.b.c["ink"], "m")
+
+
+def quote(c, im, el, t):
+    u = pop(t, el.get("at", 0), 0.35)
+    if u is None:
+        return
+    size = el.get("size", 56)
+    x, w = el.get("x", 90), el.get("w", 900)
+    lines = c.wrap(el["text"], size, "bold", w - 120)
+    lh = size * 1.3
+    h = 150 + lh * len(lines) + (70 if el.get("author") else 0)
+    y = el.get("y", 640) + (1 - u) * 50
+    accent = col(c, el.get("color"), "accent")
+    soft_shadow(im, [x, y, x + w, y + h], 30)
+    c.rr([x, y, x + w, y + h], 30, fill=c.b.c["panel"])
+    c.rr([x, y, x + 14, y + h], 7, fill=accent)
+    c.text((x + 70, y + 70), "\u201c", size * 2.4, "display", accent, "lm")
+    for i, ln in enumerate(lines):
+        _rich_line(c, x + 70, y + 120 + lh * i + lh / 2, ln, size, "bold", c.b.c["fg"], c.b.c["highlight"], c.b.c["ink"], "l")
+    if el.get("author"):
+        c.text((x + 70, y + h - 50), "\u2014 " + el["author"], size * 0.62, "bold", c.b.c["muted"], "lm")
+
+
+def split(c, im, el, t):
+    """Two columns: myth vs fact, before vs after, don't vs do. Right side appears `step` s after left."""
+    t0, step = el.get("at", 0), el.get("step", 1.2)
+    y = el.get("y", 640)
+    h = el.get("h", 480)
+    size = el.get("size", 46)
+    sides = [("left", 70, el.get("left", {}), "bad", "\u00d7"), ("right", 555, el.get("right", {}), "good", "\u2713")]
+    for i, (_, x, side, dcol, mark) in enumerate(sides):
+        u = pop(t, t0 + i * step, 0.35)
+        if u is None:
+            continue
+        cc = col(c, side.get("color"), dcol)
+        yy = y + (1 - u) * 60
+        c.rr([x, yy, x + 455, yy + h], 30, fill=c.b.c["panel"], outline=cc, width=5)
+        c.rr([x, yy, x + 455, yy + 96], 30, fill=cc)
+        c.rr([x, yy + 60, x + 455, yy + 96], 0, fill=cc)
+        c.text((x + 227, yy + 50), side.get("title", "BEFORE" if i == 0 else "AFTER"), 46, "display", c.b.c["ink"])
+        ty = yy + 150
+        for ln in c.wrap(side.get("text", ""), size, "bold", 390):
+            _rich_line(c, x + 32, ty, ln, size, "bold", c.b.c["fg"], c.b.c["highlight"], c.b.c["ink"], "l")
+            ty += size * 1.3
+        for it in side.get("items", []):
+            c.text((x + 44, ty), mark, size, "display", cc)
+            for j, ln in enumerate(c.wrap(it, size * 0.9, "bold", 340)):
+                _rich_line(c, x + 84, ty + j * size * 1.15, ln, size * 0.9, "bold", c.b.c["fg"], c.b.c["highlight"], c.b.c["ink"], "l")
+            ty += size * 1.15 * len(c.wrap(it, size * 0.9, "bold", 340)) + size * 0.5
+    if el.get("vs", True) and pop(t, t0 + step, 0.3) is not None:
+        c.ell([540 - 52, y + h / 2 - 52, 540 + 52, y + h / 2 + 52], fill=c.b.c["highlight"])
+        c.text((540, y + h / 2), el.get("vs_text", "VS"), 40, "display", c.b.c["ink"])
+
+
+_PHOTO = {}
+
+
+def photo(c, im, el, t):
+    """Photo in a rounded frame with a slow zoom/pan (Ken Burns). zoom: [start, end] over `dur` s."""
+    t0 = el.get("at", 0)
+    u = pop(t, t0, 0.35)
+    if u is None:
+        return
+    src = el["src"]
+    if not os.path.isabs(src):
+        src = os.path.join(el.get("_base", "."), src)
+    if src not in _PHOTO:
+        _PHOTO[src] = Image.open(src).convert("RGB")
+    img = _PHOTO[src]
+    w, h = el.get("w", 940), el.get("h", 700)
+    x, y = el.get("x", 540) - w / 2, el.get("y", 860) - h / 2 + (1 - u) * 50
+    z0, z1 = el.get("zoom", [1.0, 1.15])
+    z = lerp(z0, z1, (t - t0) / el.get("dur", 5.0))
+    ar = w / h
+    cw = min(img.width, img.height * ar) / z
+    ch = cw / ar
+    px, py = el.get("pan", [0.5, 0.5])
+    cx = (img.width - cw) * px
+    cy = (img.height - ch) * py
+    crop = img.resize((int(w * K), int(h * K)), Image.LANCZOS, box=(cx, cy, cx + cw, cy + ch))
+    mask = Image.new("L", crop.size, 0)
+    from PIL import ImageDraw
+    ImageDraw.Draw(mask).rounded_rectangle([0, 0, crop.width - 1, crop.height - 1], int(el.get("radius", 30) * K), fill=255)
+    soft_shadow(im, [x, y, x + w, y + h], el.get("radius", 30))
+    im.paste(crop, (int(x * K), int(y * K)), mask)
+    if el.get("caption"):
+        pill(c, im, {"text": el["caption"], "x": x + w / 2, "y": y + h - 60, "at": t0, "color": el.get("color"), "size": 40}, t)
+
+
+def numbered(c, im, el, t):
+    """Top-N list. countdown: true shows N..1 (best last). Items appear every `step` s."""
+    t0, step = el.get("at", 0), el.get("step", 1.0)
+    items = el.get("items", [])
+    size = el.get("size", 50)
+    x, y = el.get("x", 90), el.get("y", 620)
+    gap = el.get("gap", size * 2.4)
+    n = len(items)
+    for i, it in enumerate(items):
+        u = pop(t, t0 + i * step, 0.3)
+        if u is None:
+            break
+        num = n - i if el.get("countdown", False) else i + 1
+        yy = y + i * gap
+        xx = x - (1 - u) * 80
+        cc = col(c, el.get("color"), "accent")
+        c.rr([xx, yy - size * 0.85, xx + size * 1.7, yy + size * 0.85], 22, fill=cc)
+        c.text((xx + size * 0.85, yy), str(num), size * 1.1, "display", c.b.c["ink"])
+        lines = c.wrap(it, size, "bold", 900 - size * 2.2 - (x - 60))
+        for j, ln in enumerate(lines):
+            _rich_line(c, xx + size * 2.2, yy + (j - (len(lines) - 1) / 2) * size * 1.2, ln, size, "bold",
+                       c.b.c["fg"], c.b.c["highlight"], c.b.c["ink"], "l")
+
+
+def emoji_el(c, im, el, t):
+    """A big emoji that pops (and optionally bounces). Needs a colour emoji font (see reelkit check)."""
+    from . import emoji as E
+    t0 = el.get("at", 0)
+    u = pop(t, t0, 0.4)
+    if u is None:
+        return
+    size = el.get("size", 200) * max(0.05, u)
+    bounce = abs(math.sin((t - t0) * 4)) * 24 if el.get("bounce", False) else 0
+    g = E.glyph(el.get("char", "\U0001F525"), size * K)
+    if g is None:
+        return
+    g = g.rotate(el.get("angle", 0), expand=True, resample=Image.BICUBIC)
+    im.paste(g, (int(el.get("x", 540) * K - g.width / 2), int((el.get("y", 900) - bounce) * K - g.height / 2)), g)
+
+
+def subtitle(c, im, text_, t_line, brand_y=1340, dur=None, max_lines=2):
+    """Burned-in subtitle used by dialogue lines. Long lines are shown 2 lines at a time,
+    paged by how far into the line we are (pages get time in proportion to their length)."""
     size = 50
     lines = c.wrap(text_, size, "bold", 860)
+    if dur and len(lines) > max_lines:
+        pages = [lines[i:i + max_lines] for i in range(0, len(lines), max_lines)]
+        weights = [sum(len(x) for x in pg) for pg in pages]
+        u, acc = max(0.0, t_line) / dur * sum(weights), 0
+        lines = pages[-1]
+        for pg, w in zip(pages, weights):
+            acc += w
+            if u < acc:
+                lines = pg
+                break
     lh = size * 1.25
     h = lh * len(lines) + 40
     y0 = brand_y - h
@@ -283,7 +449,8 @@ def subtitle(c, im, text_, t_line, brand_y=1340):
 TYPES = {
     "headline": headline, "text": text, "terminal": terminal, "bubble": bubble, "sticker": sticker,
     "pill": pill, "checklist": checklist, "stamp": stamp, "image": image, "character": character,
-    "progress_ring": progress_ring,
+    "progress_ring": progress_ring, "stat": stat, "quote": quote, "split": split, "photo": photo,
+    "list": numbered, "emoji": emoji_el,
 }
 
 
