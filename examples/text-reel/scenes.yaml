@@ -1,0 +1,47 @@
+# Example text reel: "Stop writing 'fix' commits". Render:
+#   python -m reelkit stills examples/text-reel/scenes.yaml -o /tmp/st/f
+#   python -m reelkit render examples/text-reel/scenes.yaml -o reel.mp4
+meta: {title: "fix-commits", fps: 60}
+brand: ../../brand.example.yaml
+audio:
+  music: {mood: chill}
+
+cover:
+  tag: "#01"
+  headline: "Your commits say *fix*. Fix *what?*"
+  sub: "a 10-second habit"
+  character: {who: bot, mood: deadpan}
+
+scenes:
+  - name: hook
+    dur: 3.0
+    glow: bad
+    elements:
+      - {type: headline, text: "Your git log is a *crime scene*", at: 0.0}
+      - {type: terminal, at: 0.5, y: 700, title: "git log --oneline", cps: 60,
+         lines: ["a1f3 fix", "9c2e fix again", "77d0 ok now fix", "e4b1 asdfgh"]}
+      - {type: stamp, text: "WHO DID THIS", at: 2.0, y: 1180}
+
+  - name: pain
+    dur: 3.4
+    elements:
+      - {type: headline, text: "6 months later: *you* did this", y: 420}
+      - {type: character, who: dev, mood: shocked, x: 540, y: 1400, scale: 0.95}
+      - {type: sticker, text: "send this to your\nteam lead", at: 1.4, x: 760, y: 610, angle: 6}
+
+  - name: fix
+    dur: 6.0
+    glow: good
+    elements:
+      - {type: headline, text: "Write *why*, not *what*", y: 420}
+      - {type: terminal, at: 0.4, y: 560, title: "the template", cps: 30,
+         lines: ["$ git commit", "fix(auth): refresh token on 401", "", "# why: users got logged out", "# after 15 min idle"]}
+      - {type: checklist, at: 3.6, y: 1150, step: 0.55,
+         items: ["*type(scope):* summary", "body = the *why*", "under 72 chars"]}
+
+  - name: payoff
+    dur: 3.2
+    elements:
+      - {type: headline, text: "Future you says *thanks*", y: 430}
+      - {type: character, who: bot, mood: happy, x: 540, y: 1380, scale: 0.9}
+      - {type: pill, text: "save this for your next PR", at: 1.0, y: 760}
