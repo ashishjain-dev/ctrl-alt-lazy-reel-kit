@@ -75,7 +75,6 @@ Every element has `type`, `at` (start, default 0), optional `until` (hide after)
 | `photo` | src, x 540, y 860, w 940, h 700, zoom [1.0, 1.15], pan [0.5, 0.5], dur 5, radius 30, caption | photo with slow zoom (Ken Burns); use photos you own or have rights to |
 | `list` | items[], x 90, y 620, step 1.0, size 50, gap, countdown false, color accent | numbered top-N list (`countdown: true` shows N..1) |
 | `emoji` | char "🔥", x 540, y 900, size 200, angle 0, bounce false | big emoji; needs a colour emoji font on the machine |
-| `scene` | name kite, style (default: the reel's `style`, else flat), at, offset | a full-frame animated hero scene painted in an art style (Pillow engine) |
 | `custom` | file (a .py next to scenes.yaml), at, until, args {…}, style | art written for this video: `draw(ctx, t, args)`. See [custom-art.md](custom-art.md) |
 
 Emoji also work inline in any text (`"Payday 💸"`). Pillow needs a colour emoji font (Noto Color Emoji on Linux, built in on macOS/Windows); `reelkit check` tells you. Remotion uses the system emoji font the same way.
@@ -115,19 +114,20 @@ dialogue:
 
 ## Style Drop (one scene, many art styles)
 
-A `style_drop:` block replaces `scenes:` with generated cards: a title, a numbered list of styles on the left, a 9:16 card on the right that wipes to the next style every `card_dur` seconds, then an outro of moving tiles and a CTA. Pillow engine only for now. See `skills/style-drop/SKILL.md` and `examples/style-drop-kite/`.
+A `style_drop:` block replaces `scenes:` with generated cards: a title, a numbered list of styles on the left, a 9:16 card on the right that wipes to the next style every `card_dur` seconds, then an outro of moving tiles and a CTA. The scene is always a custom file ([custom-art.md](custom-art.md)). Pillow engine only for now. See `skills/style-drop/SKILL.md` and the example `examples/style-drop-kite/`.
 
 ```yaml
 style_drop:
-  scene: kite                       # built-in hero scene (5 s, cut at 2.0 s)
-  # file: my_scene.py               # or your own scene file, painted per style (then also: impact, clip_dur)
+  file: chai_scene.py               # the scene: a file next to scenes.yaml, painted per style (ctx.style)
+  impact: 2.0                       # the big moment, seconds into the clip
+  clip_dur: 5.0
   styles: [fish-scale-folk, rice-paper, mud-wall, cyan-plan, cut-card]
-  title: ["5 kite styles", "one Makar Sankranti cut"]
+  title: ["5 chai styles", "one Monday morning"]
   card_dur: 2.0
   clip_offset: 1.05                 # clip time at the start of each card
   wipe: 0.28
   outro: 3.0
-  cta: "COMMENT 'KITE'\nFOR THE PROMPTS"
+  cta: "COMMENT 'CHAI'\nFOR THE PROMPTS"
   bg: "#f4ecdc"                     # also: ink, accent, muted
 ```
 

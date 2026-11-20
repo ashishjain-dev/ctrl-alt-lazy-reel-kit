@@ -1,6 +1,6 @@
 # A narrated folk story, every picture drawn for this video by two small custom files:
 #   dadi.py        the storyteller (a custom character: moods + lip sync like the built-ins)
-#   crow_scene.py  the story pictures (a custom element)
+#   crow_scene.py  the story pictures: one full-screen world, a different camera shot per story beat
 # Both follow the Fish-Scale Folk style guide (docs/style-guides.md). Render:
 #   reelkit stills examples/folk-story-crow/scenes.yaml -o stills/f
 #   reelkit render examples/folk-story-crow/scenes.yaml -o crow.mp4
@@ -23,7 +23,7 @@ scenes:
     elements:
       - {type: custom, file: crow_scene.py, args: {phase: arrive, dur: 5.5}}
     cast:
-      - {who: dadi, x: 540, y: 1262, scale: 0.56, mood: happy}
+      - {who: dadi, x: 875, y: 1232, scale: 0.4, mood: happy}
     dialogue:
       - {who: dadi, voice: d1, text: "On a hot day, a *thirsty* crow found a pot. But the water was too low."}
 
@@ -31,7 +31,7 @@ scenes:
     elements:
       - {type: custom, file: crow_scene.py, args: {phase: pebbles, dur: 6.5}}
     cast:
-      - {who: dadi, x: 540, y: 1262, scale: 0.56, mood: think}
+      - {who: dadi, x: 875, y: 1232, scale: 0.4, mood: think}
     dialogue:
       - {who: dadi, voice: d2, text: "So he dropped in pebbles, one by one, and the water *rose*."}
     tail: 2.0
@@ -40,7 +40,7 @@ scenes:
     elements:
       - {type: custom, file: crow_scene.py, args: {phase: drink, dur: 4.5}}
     cast:
-      - {who: dadi, x: 540, y: 1262, scale: 0.56, mood: smug}
+      - {who: dadi, x: 875, y: 1232, scale: 0.4, mood: smug}
     dialogue:
       - {who: dadi, voice: d3, text: "He drank, and flew away happy.", mood: happy}
 
@@ -48,6 +48,6 @@ scenes:
     dur: 4.0
     elements:
       - {type: custom, file: crow_scene.py, args: {phase: fly, dur: 4.0}}
-      - {type: sticker, text: "Think, then try again", at: 0.6, x: 540, y: 1330, angle: -4}
+      - {type: sticker, text: "Think, then try again", at: 0.6, x: 420, y: 1330, angle: -4}
     cast:
-      - {who: dadi, x: 540, y: 1262, scale: 0.56, mood: happy}
+      - {who: dadi, x: 875, y: 1232, scale: 0.4, mood: happy}

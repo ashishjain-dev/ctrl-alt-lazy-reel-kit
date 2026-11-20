@@ -2,11 +2,13 @@
 
 scenes.yaml:
     style_drop:
-      scene: kite              # a built-in scene, or instead: file: my_scene.py + impact: 2.0 (custom scene file)
+      file: kite_scene.py      # the scene, drawn by a file next to scenes.yaml: draw(ctx, t, args), ctx.style = style
+      impact: 2.0              # the big moment (s), same in every style
+      clip_dur: 5.0
       styles: [fish-scale-folk, rice-paper, mud-wall, cyan-plan, cut-card]
       title: ["5 Kite", "art styles"]
       card_dur: 2.0          # seconds per style card
-      clip_offset: 1.05      # clip time shown at the start of each card (cut lands at 2.0 - 1.05 = 0.95 s in)
+      clip_offset: 1.05      # clip time shown at the start of each card (impact lands at 2.0 - 1.05 = 0.95 s in)
       outro: 3.0
       cta: "COMMENT 'KITE' FOR THE PROMPTS"
       bg: "#f4ecdc"
@@ -20,7 +22,7 @@ from PIL import Image, ImageDraw
 
 from ..brand import hex2rgb
 from ..draw import K, Cv, smooth
-from . import SCENES, STYLES, draw_scene
+from . import STYLES
 
 CARD = (470, 440, 1010, 1400)          # x0, y0, x1, y1 (9:16, 540 x 960)
 NAMES = {"fish-scale-folk": "Fish-Scale Folk", "rice-paper": "Rice Paper", "mud-wall": "Mud Wall",
@@ -36,8 +38,9 @@ def build_scenes(cfg):
     styles = cfg.get("styles") or [s for s in STYLES if s != "flat"]
     cd = float(cfg.get("card_dur", 2.0))
     off = float(cfg.get("clip_offset", 1.05))
-    impact = float(cfg["impact"]) if cfg.get("file") else SCENES[cfg.get("scene", "kite")].CUT_T
-    cut_in = impact - off
+    if not cfg.get("file"):
+        raise ValueError("style_drop needs `file:` (a scene file next to scenes.yaml, see docs/custom-art.md) and `impact:`")
+    cut_in = float(cfg.get("impact", 2.0)) - off
     scenes = []
     for i, st in enumerate(styles):
         scenes.append({"name": f"card{i + 1}", "dur": cd, "no_punch": True, "whoosh": i > 0,
@@ -56,25 +59,19 @@ def _bg(c, im, cfg):
 
 
 def _render_style(scene, style, t, w, h):
-    """Render the scene in a style at full size, return it scaled to w x h (supersampled px).
-    `scene` is a built-in scene name, or a dict {file, _base, args} for a custom scene file."""
+    """Render the scene file in a style at full size, return it scaled to w x h (supersampled px)."""
     big = Image.new("RGB", (1080 * K, 1920 * K))
     from ..brand import Brand
     b = Brand()
-    if isinstance(scene, dict):
-        from ..custom import draw_element
-        from . import style_class
-        b.c.update(style_class(style).brand)
-        draw_element(Cv(big, b), big, {**scene, "style": style}, t)
-    else:
-        draw_scene(Cv(big, b), big, scene, style, t)
+    from ..custom import draw_element
+    from . import style_class
+    b.c.update(style_class(style).brand)
+    draw_element(Cv(big, b), big, {**scene, "style": style}, t)
     return big.resize((int(w * K), int(h * K)), Image.LANCZOS)
 
 
 def _scene_ref(cfg):
-    if cfg.get("file"):
-        return {"file": cfg["file"], "_base": cfg.get("_base", "."), "args": cfg.get("args", {})}
-    return cfg.get("scene", "kite")
+    return {"file": cfg["file"], "_base": cfg.get("_base", "."), "args": cfg.get("args", {})}
 
 
 def _rounded(img, r):

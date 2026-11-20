@@ -70,7 +70,10 @@ class Ctx:
 def draw_element(c, im, el, t):
     path = el["file"] if os.path.isabs(el["file"]) else os.path.join(el.get("_base", "."), el["file"])
     mod = load(path)
-    mod.draw(Ctx(c, im, el), t, el.get("args", {}) or {})
+    ctx = Ctx(c, im, el)
+    ctx.painter.t = t
+    ctx.t = t
+    mod.draw(ctx, t, el.get("args", {}) or {})
 
 
 def character_fn(path):

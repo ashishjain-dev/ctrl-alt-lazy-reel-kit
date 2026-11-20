@@ -27,9 +27,9 @@ Pick a built-in character or design your own (hair, skin tone, outfit, hat, glas
 
 ## Art styles and Style Drops
 
-Five original art styles, each inspired by a traditional or familiar art form: **Fish-Scale Folk**, **Rice Paper**, **Mud Wall**, **Cyan Plan** and **Cut Card**. Use one on a single hero scene, put several side by side in a Style Drop reel, or re-skin any reel with `style: mud-wall`. The built-in hero scene: a dragon kite cuts a rival kite on a Makar Sankranti rooftop, with the cut landing at 2.0 s in every style.
+Five original art styles, each inspired by a traditional or familiar art form: **Fish-Scale Folk**, **Rice Paper**, **Mud Wall**, **Cyan Plan** and **Cut Card**. Re-skin any reel with `style: mud-wall`, have Claude draw your story or scene in a style, or put several styles side by side in a Style Drop reel. Every scene comes from your own idea; the example below (a dragon kite cutting a rival kite at Makar Sankranti) is just one of them.
 
-![The kite scene at the moment of the cut, in all 5 styles](docs/img/style-drop-kite.jpg)
+![Example scene: the kite at the moment of the cut, in all 5 styles](docs/img/style-drop-kite.jpg)
 
 ## Skills
 
@@ -39,7 +39,7 @@ Five original art styles, each inspired by a traditional or familiar art form: *
 | [`reel-planner`](skills/reel-planner/SKILL.md) | Fact check, ranked hooks, timed beat sheet, cover and caption. Nothing renders until you say go ahead |
 | [`text-reel`](skills/text-reel/SKILL.md) | Tips, tutorials, narrated explainers, lists, myth vs fact |
 | [`dialogue-skit`](skills/dialogue-skit/SKILL.md) | Character skits and stories with voices and lip sync |
-| [`style-drop`](skills/style-drop/SKILL.md) | One scene in many art styles, cut into one reel; also how to add new styles and scenes |
+| [`style-drop`](skills/style-drop/SKILL.md) | Your scene in many art styles, cut into one reel; also how to add new styles |
 | [`reel-cover-grid`](skills/reel-cover-grid/SKILL.md) | Cover image + 3:4 profile-grid preview |
 
 **Install:**
@@ -105,7 +105,7 @@ scenes:
       - {type: emoji, char: "💦", at: 1.6, y: 1250, size: 160}
 ```
 
-Examples: [`folk-story-crow`](examples/folk-story-crow/scenes.yaml) (narrated story, custom storyteller and pictures), [`style-drop-kite`](examples/style-drop-kite/scenes.yaml) (one scene, 5 art styles), [`money-tip`](examples/money-tip/scenes.yaml) (stat, list, quote), [`fitness-myths`](examples/fitness-myths/scenes.yaml) (narrator, myth vs fact, custom character), [`dialogue-skit`](examples/dialogue-skit/scenes.yaml) (two characters talking), [`text-reel`](examples/text-reel/scenes.yaml) (tech tip with a terminal).
+Examples: [`folk-story-crow`](examples/folk-story-crow/scenes.yaml) (narrated story: a storyteller and full-screen story backgrounds drawn from the script), [`style-drop-kite`](examples/style-drop-kite/scenes.yaml) (one scene file painted in 5 art styles), [`money-tip`](examples/money-tip/scenes.yaml) (stat, list, quote), [`fitness-myths`](examples/fitness-myths/scenes.yaml) (narrator, myth vs fact, custom character), [`dialogue-skit`](examples/dialogue-skit/scenes.yaml) (two characters talking), [`text-reel`](examples/text-reel/scenes.yaml) (tech tip with a terminal).
 
 The Remotion + Three.js engine is documented in [engines/remotion/README.md](engines/remotion/README.md).
 

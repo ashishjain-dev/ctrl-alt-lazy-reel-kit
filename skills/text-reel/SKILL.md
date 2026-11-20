@@ -45,6 +45,7 @@ Pick elements by what the scene says:
 - a claim → `headline`; a number → `stat` (counts up); steps → `list` or `checklist`; myth vs fact / before vs after → `split`; a saying → `quote`; a product, dish or place → `photo` (slow zoom) or `image`; code or commands → `terminal`; the punchline → one `stamp` or `sticker`; a reaction → `emoji` or a `character` with a mood.
 - Voice-over: `dialogue` lines with `who: narrator` and a `voice:` key. Subtitles are burned in and paged two lines at a time.
 - Characters (optional): show `docs/img/characters.jpg` and let the user pick `person` (customizable), `bot`, `blob` or `dev`, or define a named one in `brand.yaml > characters`. For a narrator drawn in the reel's art style, or anything else the built-ins can't draw (story pictures, props, products), write custom art: `docs/custom-art.md` + `docs/style-guides.md`, example `examples/folk-story-crow`.
+- Narrated stories: every beat of the script gets a full-screen background drawn from what the narration says (one story world in a custom file, a different shot per beat; see "Story backgrounds come from the script" in `docs/custom-art.md`). The narrator stands in a corner in front of it.
 
 Rules that keep reels watchable:
 - Headline at y≈430 on every scene; content between y 280 and 1440 and left of x≈850 (app UI covers the rest). Leave room above y≈1180 when there are subtitles.

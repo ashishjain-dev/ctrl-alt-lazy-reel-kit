@@ -31,6 +31,22 @@ What `ctx` gives you:
 
 A custom element draws in the order it appears in `elements`: put backgrounds first.
 
+### Story backgrounds come from the script
+
+For a narrated story or explainer, every beat of the script gets a **full-screen** background that shows
+what the narration says, in the reel's style. Nothing is reused from the examples unless the script asks for it.
+
+1. Split the script into beats (one per scene in scenes.yaml): *crow arrives → drops pebbles → drinks → flies off*.
+2. Draw the story's world once, in world coordinates, as one custom file (`story_scene.py`): the place,
+   the props, the animated subject.
+3. Give each beat its own **shot** of that world: a wide shot, a close-up, a different spot, a different
+   time of day. Pass it as `args: {phase: ..., dur: ...}` and pick a camera (zoom + centre) per phase,
+   with a slow push-in. A new location in the script means a new part of the world (or a second file).
+4. Leave room for the narrator (a corner, e.g. x > 760, y 950–1250) and for subtitles (y 1240–1400).
+5. Put the custom background first in each scene's `elements`; the cast stands in front of it automatically.
+
+`examples/folk-story-crow/crow_scene.py` shows the pattern (a `Cam` class, one world, four shots).
+
 ## 2. Custom character: talks, lip-syncs, changes mood
 
 ```yaml
@@ -52,7 +68,7 @@ series uses the same file.
 
 ```yaml
 style_drop:
-  file: my_scene.py        # instead of scene: kite
+  file: my_scene.py        # the scene, painted once per style
   impact: 2.0              # the big moment, same in every style
   clip_dur: 5.0
   styles: [fish-scale-folk, mud-wall, cut-card]
