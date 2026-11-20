@@ -1,0 +1,21 @@
+# media is output, not source
+*.mp4
+*.mov
+*.wav
+*.mp3
+*.m4a
+*.png
+*.jpg
+!docs/img/*.jpg
+# secrets
+.env
+*.key
+# python / node
+__pycache__/
+*.egg-info/
+.venv/
+node_modules/
+engines/remotion/public/*
+!engines/remotion/public/.gitkeep
+engines/remotion/out/
+stills/

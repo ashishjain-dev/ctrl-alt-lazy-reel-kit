@@ -1,0 +1,42 @@
+# Example dialogue skit: the dev and the bot. Works without voices (timing is estimated and the
+# mouths animate on a pattern). Add real voices:
+#   1. record/TTS each line, or one dialogue file, then:
+#      python -m reelkit voices gaps dialogue.mp3
+#      python -m reelkit voices split dialogue.mp3 d1=0-1.4 b1=1.8-3.6 d2=4.0-5.1 b2=5.5-7.9 --dir examples/dialogue-skit --robot b
+#   2. or ElevenLabs: set ELEVENLABS_API_KEY + audio.tts_voices, then python -m reelkit voices tts examples/dialogue-skit/scenes.yaml
+meta: {title: "small-change", fps: 60}
+brand: ../../brand.example.yaml
+audio:
+  music: {mood: chill, volume: 0.45}
+  duck: 0.3
+  # tts_voices: {dev: "<elevenlabs voice id>", bot: "<elevenlabs voice id>"}
+
+cover:
+  headline: "\"It's a *small* change\""
+  sub: "- every PM at 6:58 PM"
+  character: {who: dev, mood: shocked, x: 760, y: 1640, scale: 0.85}
+
+scenes:
+  - name: setup
+    glow: accent
+    elements:
+      - {type: headline, text: "6:58 PM. *Friday.*", y: 420}
+    cast:
+      - {who: dev, x: 300, y: 1170, scale: 0.78, mood: happy}
+      - {who: bot, x: 790, y: 1170, scale: 0.72, mood: neutral}
+    dialogue:
+      - {who: dev, voice: d1, text: "Laptop closed. Weekend mode."}
+      - {who: bot, voice: b1, text: "New message from your PM: *small change*.", react: {dev: shocked}}
+
+  - name: punch
+    glow: bad
+    elements:
+      - {type: headline, text: "\"Just move the *database*\"", y: 420}
+      - {type: sticker, text: "send this to your PM", at: 2.4, x: 560, y: 560, angle: -4}
+    cast:
+      - {who: dev, x: 300, y: 1170, scale: 0.78, mood: shocked}
+      - {who: bot, x: 790, y: 1170, scale: 0.72, mood: deadpan}
+    dialogue:
+      - {who: dev, voice: d2, text: "How small?", mood: sad}
+      - {who: bot, voice: b2, text: "Database. Region. *Tonight.*", mood: deadpan}
+      - {who: dev, voice: d3, text: "I'm opening the laptop again.", mood: deadpan, react: {bot: happy}}

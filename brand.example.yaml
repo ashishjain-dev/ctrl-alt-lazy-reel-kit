@@ -1,0 +1,43 @@
+# Copy to brand.yaml and edit. Every key is optional; missing keys use neutral defaults.
+handle: "@your.handle"          # watermark + cover footer. "" hides it
+label: "DEV TIPS"               # small label in the top band. "" hides it
+
+colors:                         # hex. Text marked *like this* uses `highlight`
+  bg_top: "#1a1622"
+  bg_bottom: "#0c0e16"
+  fg: "#f6f6fa"
+  muted: "#a0a0af"
+  accent: "#e8805c"             # top bar, progress bar, pills
+  highlight: "#fcce4a"
+  good: "#7ad696"
+  bad: "#f06056"
+  panel: "#22222e"
+  ink: "#121216"
+  info: "#82aaf0"
+
+fonts:                          # file names (searched in system font folders) or full paths
+  display: ["Inter-Black.otf", "DejaVuSans-Bold.ttf"]
+  bold: ["Inter-Bold.otf", "DejaVuSans-Bold.ttf"]
+  regular: ["Inter-Regular.otf", "DejaVuSans.ttf"]
+  mono: ["JetBrainsMono-Bold.ttf", "DejaVuSansMono-Bold.ttf"]
+
+web_fonts:                      # Remotion engine only (CSS font-family)
+  display: "Inter, 'DejaVu Sans', sans-serif"
+  mono: "'JetBrains Mono', 'DejaVu Sans Mono', monospace"
+
+frame:
+  progress_bar: true
+  watermark: true
+  accent_bar: true
+  safe_top: 280                 # Instagram/TikTok overlay safe zone
+  safe_bottom: 1440
+  safe_right: 850
+
+music:
+  mood: chill                   # chill | upbeat | tense | none
+  bpm: 92
+  volume: 0.55
+
+characters:                     # recolour the built-in characters
+  dev: {skin: "#f1c7a3", hair: "#3a2a24", shirt: "#3fa796", phones: "#e8805c", pants: "#2c3450"}
+  bot: {body: "#c9d2e0", screen: "#141a26", eyes: "#7af0c8", trim: "#5a6a86"}
