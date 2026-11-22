@@ -2,7 +2,7 @@
 
 One guide per art style, in plain words. Claude follows these when it writes custom art at runtime
 (a character, a story picture, a whole scene; see [custom-art.md](custom-art.md)), so anything drawn for
-any video matches the style. The first five also exist as built-in code in `engines/pillow/reelkit/art/`:
+any video matches the style. The first seven also exist as built-in code in `engines/pillow/reelkit/art/`:
 read that file as the reference implementation, and reuse its colours and helpers.
 
 Every guide has the same parts: **surface** (background), **palette**, **line**, **fill**, **figures**
@@ -75,8 +75,34 @@ Inspired by layered paper cut-out animation.
 - **Frame:** none.
 - **Avoid:** ink outlines, gradients inside pieces, smooth 60 fps motion.
 
+## Cel Burst (built in: `cel-burst`, `art/celburst.py`)
+Inspired by TV-anime cel shading (the animated-epic look). Best for stories with characters.
+- **Surface:** a saturated gradient sky (`sky_gradient`) with huge cumulus clouds (`cloud`: flat lit colour, a hard shadow on the underside, ink outline), sun rays (`rays`) and a lens flare (`flare`).
+- **Palette:** bright and high contrast: azure sky, warm sunrise or violet dusk, white clouds with lavender shadows, saturated clothes.
+- **Line:** bold ink outlines (about 3.5% of a face's width) on every shape.
+- **Fill:** two-tone cel shading with a hard shadow edge: draw the base colour, then `shade(shape, shadow_area, darker)` paints only where they overlap.
+- **Figures:** use `Character` for busts: big eyes with two highlights, small nose and mouth, hair with a shine band, beard, tilak and jewellery hooks. Keep one `Character(...)` per person so they look the same in every shot; `talk` (0..1) opens the mouth for lip sync and `blink` shuts the eyes.
+- **Motion:** on twos (**12 fps**, `fps = 12`); speed lines (`speed_lines`) on fast moves and big moments.
+- **Impact:** `impact(u)`: 3 black/white flash frames, one red frame, then a lens flare.
+- **Text:** heavy display font, yellow or white with a thick ink stroke and a hard drop shadow.
+- **Frame:** none.
+- **Avoid:** soft gradients on figures, thin lines, more than two tones per shape.
+
+## Gold Court (built in: `gold-court`, `art/goldcourt.py`)
+Inspired by court miniature painting. Best for calm, elegant stories, palaces and court scenes.
+- **Surface:** a pale wash (`wash`) under a lapis sky band with gold scroll clouds and stars (`lapis_band`); landscapes from `hills`, `round_tree` (round crowns with leaf dots), `river` (little woven waves), `sun`, `birds` (cranes), `pavilion`.
+- **Palette:** jewel-flat colours (vermilion, emerald, lapis, rose) with burnished gold (214, 170, 70) and pearl-white dots.
+- **Line:** hairline outlines (about 2 px) in brown ink, never thick.
+- **Fill:** flat colour; decoration as rows of gold or pearl dots, gold bands and borders.
+- **Figures:** use `figure()` for standing people in profile with one large almond eye and a straight nose: a lady in ghagra, choli, sheer veil and nose ring, or a man in a flared jama, sash and turban (`male=True`, optional `beard`), facing left or right, optionally holding a lotus. `deer()` for animals.
+- **Motion:** slow and smooth: gentle drifts and pans, nothing fast.
+- **Impact:** `gold_rays(x, y, u)`, a ring of gold rays spreading out.
+- **Text:** a serif or display font in red or lapis with a thin gold edge.
+- **Frame:** a red border with a gold vine and a hairline inner rule (`overlay`).
+- **Avoid:** thick outlines, dark backgrounds, shading and gradients on figures.
+
 ---
-The five styles below are not built in yet. Write them as custom art from these guides, or add them as
+The three styles below are not built in yet. Write them as custom art from these guides, or add them as
 built-in `Painter` subclasses (see `skills/style-drop/SKILL.md`).
 
 ## Lamp Leather
@@ -100,16 +126,6 @@ Inspired by stained glass.
 - **Impact:** a white-gold glass star and a flare.
 - **Avoid:** thin lines, large single-colour areas.
 
-## Cel Burst
-Inspired by TV-anime cel shading.
-- **Surface:** a saturated gradient sky with huge cumulus clouds.
-- **Palette:** bright, high contrast.
-- **Line:** bold ink outlines.
-- **Fill:** two-tone cel shading with a hard shadow edge.
-- **Motion:** speed lines on fast moves.
-- **Impact:** a 3-frame black/white impact flash, then one red frame, then a lens flare.
-- **Avoid:** soft gradients on figures, thin lines.
-
 ## Wave Block
 Inspired by woodblock prints.
 - **Surface:** a deep blue gradient sky, a red sun, horizontal mist bands, wood grain over everything.
@@ -118,13 +134,3 @@ Inspired by woodblock prints.
 - **Fill:** flat areas; water and clouds as stylised curling foam.
 - **Text:** a vertical cartouche with a small red seal.
 - **Avoid:** bright saturated colours, soft shading.
-
-## Gold Court
-Inspired by court miniature painting.
-- **Surface:** a lapis sky band with gold scroll clouds, a pale wash below, rolling green hills with round dotted trees and a river.
-- **Palette:** jewel-flat colours and burnished gold, pearl-white dots.
-- **Line:** hairline outlines.
-- **Figures:** elegant profiles, large eyes, fine patterned clothing.
-- **Impact:** gold rays.
-- **Frame:** a red border with a gold vine.
-- **Avoid:** thick outlines, dark backgrounds.

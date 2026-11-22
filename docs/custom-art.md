@@ -77,12 +77,43 @@ The file's `draw(ctx, t, args)` is called once per style with `ctx.style` set; b
 style from its [style guide](style-guides.md). Start with `ctx.painter.background({})` and end with
 `ctx.painter.overlay({})` to get each style's surface and frame for free.
 
+### Character kits: Cel Burst and Gold Court
+
+Two styles ship with a kit for people, so a story's characters can be set up in a few lines and stay the
+same in every shot.
+
+**Cel Burst** (`reelkit.art.celburst`): `Character(...)` is an anime bust built from numbers (skin, hair,
+eye colour, beard, jaw, brow, tilak). Hair, clothes and jewellery are shapes in unit space (1 = half the
+face width, origin at the eye line) or small callbacks. As a talking character file:
+```python
+from reelkit.art.celburst import CelBurst, Character, ell
+
+SAGE = Character(skin=(234, 182, 142), skin_sh=(198, 134, 104), hair=(238, 238, 244), hair_sh=(184, 184, 206),
+                 hair_hi=(255, 255, 255), iris=(90, 60, 40), beard=(240, 240, 246), beard_sh=(190, 190, 212), fringe=0.0, blush=False)
+HAIR_BACK = [(-1.05, -0.5), (-1.3, 1.6), (-1.7, 2.35), (1.7, 2.35), (1.3, 1.6), (1.05, -0.5), (0, -1.6)]
+TOPKNOT = [ell(0, -1.82, 0.46, 0.36, n=16)]
+
+def draw(c, x, y, s, mood, t, talk, opts):
+    p = CelBurst(c, c.im)
+    blink = (t % 4.0) < 0.12                       # blink every 4 s
+    SAGE.draw(p, x, y - 520 * s, 300 * s, hair_back=HAIR_BACK, hair_front=TOPKNOT, talk=talk, blink=blink)
+```
+Draw the body with `body=fn(p, cx, cy, s, w)` (it runs behind the face) and crowns, earrings and veils with
+`jewels=fn(p, U, s, w)` (it runs last; `U` maps unit points to pixels). `p.shade(shape, area, colour)` gives
+the hard cel shadow on anything else you draw.
+
+**Gold Court** (`reelkit.art.goldcourt`): `p.figure(x, y, s, facing=1)` draws a standing person in profile
+from the feet up: a lady (ghagra, choli, sheer veil, nose ring) or, with `male=True`, a man (flared jama,
+sash, turban, optional `beard`), with `lotus=True` for a lotus in hand. Set the colours with `dress`, `top`,
+`veil`, `turban`, `skin`, `hair`. Scenery helpers: `hills`, `round_tree`, `river`, `sun`, `birds`,
+`pavilion`, `deer`; the impact is `gold_rays`.
+
 ## Rules (they keep renders correct)
 
 1. **Pure function of `t`.** No state between frames, no `random` without a fixed seed: frames render in
    parallel and out of order. Derive everything (positions, water level, which pebble is in the air) from `t`.
 2. **Follow the style guide** for the style in use: surface, palette, line, fill, figures, motion, impact.
-   Stepped styles (`mud-wall` 8 fps, `cut-card` 12 fps) step `t` the same way: `t = int(t * fps) / fps`.
+   Stepped styles (`mud-wall` 8 fps, `cut-card` and `cel-burst` 12 fps) step `t` the same way: `t = int(t * fps) / fps`.
 3. **Safe zone:** keep important things in y 280–1440 and x < 850. Leave room above y≈1240 when there are subtitles.
 4. **One idea per picture**, readable at phone size: big shapes, strong contrast, few details.
 5. **Original only:** no logos, brands, copyrighted characters, or real people.

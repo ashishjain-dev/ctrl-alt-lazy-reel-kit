@@ -27,9 +27,9 @@ Pick a built-in character or design your own (hair, skin tone, outfit, hat, glas
 
 ## Art styles and Style Drops
 
-Five original art styles, each inspired by a traditional or familiar art form: **Fish-Scale Folk**, **Rice Paper**, **Mud Wall**, **Cyan Plan** and **Cut Card**. Re-skin any reel with `style: mud-wall`, have Claude draw your story or scene in a style, or put several styles side by side in a Style Drop reel. Every scene comes from your own idea; the example below (a dragon kite cutting a rival kite at Makar Sankranti) is just one of them.
+Seven original art styles, each inspired by a traditional or familiar art form: **Fish-Scale Folk**, **Rice Paper**, **Mud Wall**, **Cyan Plan**, **Cut Card**, **Cel Burst** (animated-epic anime, with reusable characters) and **Gold Court** (court miniature painting, with figures in profile). Re-skin any reel with `style: mud-wall`, have Claude draw your story or scene in a style, or put several styles side by side in a Style Drop reel. Every scene comes from your own idea; the example below (a dragon kite cutting a rival kite at Makar Sankranti) is just one of them.
 
-![Example scene: the kite at the moment of the cut, in all 5 styles](docs/img/style-drop-kite.jpg)
+![Example scene: the kite at the moment of the cut, in 5 of the styles](docs/img/style-drop-kite.jpg)
 
 ## Skills
 

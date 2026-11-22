@@ -21,8 +21,10 @@ pip install -e engines/pillow && reelkit check
 | `mud-wall` | white on red-brown mud, everything from circles, triangles and lines, 8 fps wobble |
 | `cyan-plan` | blueprint: grid, white line-work, dimensions, callouts, dashed paths, a target reticle, title block |
 | `cut-card` | layered paper with soft shadows and white cut edges, wavy paper sky, 12 fps stop motion |
+| `cel-burst` | anime cel shading: saturated sky, huge clouds, bold ink, two-tone hard shadows, speed lines, flash impact, 12 fps |
+| `gold-court` | court miniature: lapis band with gold scroll clouds, pale wash, dotted round trees, hairlines, red border with gold vine |
 
-Full guides (surface, palette, line, fill, figures, motion, impact, text, frame, avoid) for these five and five more (Lamp Leather, Temple Glass, Cel Burst, Wave Block, Gold Court): `docs/style-guides.md`. The scene file can paint the five extra styles from their guides.
+Full guides (surface, palette, line, fill, figures, motion, impact, text, frame, avoid) for these seven and three more (Lamp Leather, Temple Glass, Wave Block): `docs/style-guides.md`. The scene file can paint the three extra styles from their guides.
 
 ## 1. Ask (one round), then confirm a plan
 
@@ -41,7 +43,7 @@ def draw(ctx, t, args):          # called once per frame and per style; ctx.styl
     ctx.painter.overlay({})      # the style's frame
 ```
 - Keep the geometry (where things are at time `t`) in one function and paint it per style, so every style shows the same moment.
-- Pure function of `t`; the impact at a fixed time; stepped styles step `t` (`mud-wall` 8 fps, `cut-card` 12 fps).
+- Pure function of `t`; the impact at a fixed time; stepped styles step `t` (`mud-wall` 8 fps, `cut-card` and `cel-burst` 12 fps).
 - Rules, helpers and checks: `docs/custom-art.md`. A complete, hand-tuned example: `examples/style-drop-kite/` (`kite_scene.py` + `kite_art/`: geometry in `layout.py`, one module per style). Learn the pattern from it; don't reuse the kite unless the user asks for kites.
 
 ## 3. Check the look first (fast)
