@@ -16,13 +16,13 @@ if HERE not in sys.path:
 from kite_art import layout  # noqa: E402
 
 MODULES = {"fish-scale-folk": "folk", "rice-paper": "ricepaper", "mud-wall": "mudwall",
-           "cyan-plan": "cyanplan", "cut-card": "cutcard"}
+           "cyan-plan": "cyanplan", "cut-card": "cutcard", "cel-burst": "celburst", "gold-court": "goldcourt"}
 DUR, CUT_T = layout.DUR, layout.CUT_T
 
 
 def draw(ctx, t, args):
     style = ctx.style if ctx.style in MODULES else "fish-scale-folk"
     Kite = importlib.import_module("kite_art." + MODULES[style]).Kite
-    if Kite.fps:                                   # stepped styles (mud-wall 8 fps, cut-card 12 fps)
+    if Kite.fps:                                   # stepped styles (mud-wall 8 fps, cut-card and cel-burst 12 fps)
         t = math.floor(t * Kite.fps) / Kite.fps
     Kite(ctx.c, ctx.im).paint(layout.layout(t + float(args.get("offset", 0))))

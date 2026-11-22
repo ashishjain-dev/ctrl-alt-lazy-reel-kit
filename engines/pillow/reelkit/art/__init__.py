@@ -5,15 +5,17 @@ Scenes are not part of the engine: every picture is drawn for its video by a cus
 (see reelkit/custom.py, docs/custom-art.md and docs/style-guides.md). examples/style-drop-kite and
 examples/folk-story-crow show how.
 """
+from .celburst import CelBurst
 from .cutcard import CutCard
 from .cyanplan import CyanPlan
 from .folk import FishScaleFolk
+from .goldcourt import GoldCourt
 from .mudwall import MudWall
 from .painter import Painter
 from .ricepaper import RicePaper
 
 STYLES = {"flat": Painter, "fish-scale-folk": FishScaleFolk, "rice-paper": RicePaper, "mud-wall": MudWall,
-          "cyan-plan": CyanPlan, "cut-card": CutCard}
+          "cyan-plan": CyanPlan, "cut-card": CutCard, "cel-burst": CelBurst, "gold-court": GoldCourt}
 
 
 def style_class(name):

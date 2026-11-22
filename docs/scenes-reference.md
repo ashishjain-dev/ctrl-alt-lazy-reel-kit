@@ -11,7 +11,8 @@ meta:
   clean: false            # true = no label / handle / progress bar / fades (e.g. single Style Drop clips)
 brand: ../brand.yaml      # optional, relative to this file (see brand.example.yaml)
 style: mud-wall           # optional art style for the whole reel (Pillow engine): fish-scale-folk, rice-paper,
-                          # mud-wall, cyan-plan, cut-card. Re-skins background, colours, border, subtitles
+                          # mud-wall, cyan-plan, cut-card, cel-burst, gold-court. Re-skins background, colours,
+                          # border, subtitles
 
 audio:
   music: {mood: chill, bpm: 92, volume: 0.55, drums_from: 0}   # mood: chill | upbeat | tense | none

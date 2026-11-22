@@ -20,7 +20,7 @@ reelkit --help
 | `voices.py` | split a recording into clips + lip-sync envelope; TTS (ElevenLabs, OpenAI, macOS `say`, espeak); script export |
 | `covers.py` | cover PNG + 3:4 profile-grid preview |
 | `brand.py` | brand.yaml loading, font lookup |
-| `art/` | art styles (`painter.py` base + `folk.py`, `ricepaper.py`, `mudwall.py`, `cyanplan.py`, `cutcard.py`: surface, frame, colours, helpers) and `drop.py` (builds Style Drop reels). No scenes: scenes are custom files per video |
+| `art/` | art styles (`painter.py` base + `folk.py`, `ricepaper.py`, `mudwall.py`, `cyanplan.py`, `cutcard.py`, `celburst.py` with the `Character` bust kit, `goldcourt.py` with `figure()`: surface, frame, colours, helpers) and `drop.py` (builds Style Drop reels). No scenes: scenes are custom files per video |
 | `custom.py` | loads custom element and character files written for a video (`docs/custom-art.md`) |
 
 Requirements: Python 3.9+, ffmpeg 6+ with libx264, and fonts (Inter + DejaVu by default; any TTF/OTF works via `brand.yaml > fonts`). Speed: about 1 minute per 15 s of 60 fps video on 2 cores; `--preview` is faster, `--workers N` uses more cores.

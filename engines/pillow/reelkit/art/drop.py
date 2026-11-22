@@ -26,7 +26,8 @@ from . import STYLES
 
 CARD = (470, 440, 1010, 1400)          # x0, y0, x1, y1 (9:16, 540 x 960)
 NAMES = {"fish-scale-folk": "Fish-Scale Folk", "rice-paper": "Rice Paper", "mud-wall": "Mud Wall",
-         "cyan-plan": "Cyan Plan", "cut-card": "Cut Card", "flat": "Flat"}
+         "cyan-plan": "Cyan Plan", "cut-card": "Cut Card", "cel-burst": "Cel Burst",
+         "gold-court": "Gold Court", "flat": "Flat"}
 
 
 def label(style):
